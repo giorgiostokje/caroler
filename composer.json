@@ -14,7 +14,7 @@
         "react/event-loop": "^1.1",
         "react/socket": "^1.5",
         "ratchet/pawl": "^0.3.4",
-        "guzzlehttp/guzzle": "^7.0"
+        "guzzlehttp/guzzle": "^6.3"
     },
     "config": {
         "sort-packages": true
@@ -22,6 +22,16 @@
     "autoload": {
         "psr-4": {
             "GiorgioStokje\\Caroler\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "GiorgioStokje\\Caroler\\Laravel\\ServiceProvider"
+            ],
+            "aliases": {
+                "Caroler": "GiorgioStokje\\Caroler\\Laravel\\Facade"
+            }
         }
     }
 }
