@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Events;
+namespace GiorgioStokje\Caroler\EventHandlers;
 
 class VoiceStateUpdate
 {

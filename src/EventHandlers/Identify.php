@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Events;
+namespace GiorgioStokje\Caroler\EventHandlers;
 
 use GiorgioStokje\Caroler\Caroler;
 
 /**
  * Identify Event class
  *
- * @package GiorgioStokje\Caroler\Events
+ * @package GiorgioStokje\Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#identify
  */
-class Identify extends AbstractEvent implements EventInterface
+class Identify extends AbstractEventHandler implements EventHandlerInterface
 {
     /**
      * @var int Heartbeat interval in milliseconds
@@ -22,13 +22,14 @@ class Identify extends AbstractEvent implements EventInterface
     /**
      * @inheritDoc
      */
-    public function handle(Caroler $caroler): EventInterface
+    public function handle(Caroler $caroler): EventHandlerInterface
     {
         $caroler->loop->addPeriodicTimer($this->heartbeatInterval / 1000, function () use ($caroler) {
             (new Heartbeat())->handle($caroler);
         });
 
-        $caroler->write("Emitting heartbeat every " . round($this->heartbeatInterval / 1000, 2) . " seconds.");
+        $caroler->write("Emitting heartbeat to the Gateway every "
+            . round($this->heartbeatInterval / 1000, 2) . " seconds.");
 
         $caroler->connection->send(json_encode([
             'op' => 2,

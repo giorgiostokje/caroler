@@ -85,7 +85,7 @@ class Caroler
         $rConnector = new ReactConnector($this->loop);
         $connector = new Connector($this->loop, $rConnector);
 
-        $this->write("Connecting to Gateway...");
+        $this->write("Connecting to the Discord Gateway...");
 
         $connector(self::DISCORD_GATEWAY_URL . '?v=' . self::DISCORD_GATEWAY_VERSION . '&encoding=json')->then(
             function (WebSocket $conn) {
@@ -94,7 +94,7 @@ class Caroler
                     $payload = json_decode($payload->getPayload());
                     $this->sequence = $payload->s;
 
-                    EventFactory::make($payload)->handle($this);
+                    EventHandlerFactory::make($payload)->handle($this);
                 });
             },
             function (Exception $e) {

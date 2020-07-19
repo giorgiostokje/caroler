@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Events;
+namespace GiorgioStokje\Caroler\EventHandlers;
 
 use GiorgioStokje\Caroler\Traits\Populatable;
 use stdClass;
@@ -10,16 +10,16 @@ use stdClass;
 /**
  * Common Event functionality
  *
- * @package GiorgioStokje\Caroler\Events
+ * @package GiorgioStokje\Caroler\EventHandlers
  */
-abstract class AbstractEvent implements EventInterface
+abstract class AbstractEventHandler implements EventHandlerInterface
 {
     use Populatable;
 
     /**
      * @inheritDoc
      */
-    public function prepare(?stdClass $data): EventInterface
+    public function prepare(?stdClass $data): EventHandlerInterface
     {
         $this->populate($data);
 

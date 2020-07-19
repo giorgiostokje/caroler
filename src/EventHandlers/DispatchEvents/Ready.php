@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Events\DispatchEvents;
+namespace GiorgioStokje\Caroler\EventHandlers\DispatchEvents;
 
 use GiorgioStokje\Caroler\Caroler;
-use GiorgioStokje\Caroler\Events\AbstractEvent;
-use GiorgioStokje\Caroler\Events\EventInterface;
+use GiorgioStokje\Caroler\EventHandlers\AbstractEventHandler;
+use GiorgioStokje\Caroler\EventHandlers\EventHandlerInterface;
 use GiorgioStokje\Caroler\Objects\User;
 use GiorgioStokje\Caroler\State;
 
 /**
  * Ready Event handler class
  *
- * @package GiorgioStokje\Caroler\Events
+ * @package GiorgioStokje\Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#ready
  */
-class Ready extends AbstractEvent implements EventInterface
+class Ready extends AbstractEventHandler implements EventHandlerInterface
 {
     protected $v;
     protected $user;
@@ -28,7 +28,7 @@ class Ready extends AbstractEvent implements EventInterface
     /**
      * @inheritDoc
      */
-    public function handle(Caroler $caroler): EventInterface
+    public function handle(Caroler $caroler): EventHandlerInterface
     {
         $user = new User();
         $user->prepare($this->user);

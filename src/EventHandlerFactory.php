@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace GiorgioStokje\Caroler;
 
-use GiorgioStokje\Caroler\Events\DispatchEvents\Ready;
-use GiorgioStokje\Caroler\Events\EventInterface;
-use GiorgioStokje\Caroler\Events\Heartbeat;
-use GiorgioStokje\Caroler\Events\HeartbeatAck;
-use GiorgioStokje\Caroler\Events\Identify;
-use GiorgioStokje\Caroler\Events\NullEvent;
+use GiorgioStokje\Caroler\EventHandlers\DispatchEvents\Ready;
+use GiorgioStokje\Caroler\EventHandlers\EventHandlerInterface;
+use GiorgioStokje\Caroler\EventHandlers\Heartbeat;
+use GiorgioStokje\Caroler\EventHandlers\HeartbeatAck;
+use GiorgioStokje\Caroler\EventHandlers\Identify;
+use GiorgioStokje\Caroler\EventHandlers\NullEventHandler;
 use stdClass;
 
 /**
@@ -17,16 +17,16 @@ use stdClass;
  *
  * @package GiorgioStokje\Caroler
  */
-class EventFactory
+class EventHandlerFactory
 {
     /**
      * Creates and prepares an Event based on the given payload.
      *
      * @param \stdClass $payload
      *
-     * @return \GiorgioStokje\Caroler\Events\EventInterface
+     * @return \GiorgioStokje\Caroler\EventHandlers\EventHandlerInterface
      */
-    public static function make(stdClass $payload): EventInterface
+    public static function make(stdClass $payload): EventHandlerInterface
     {
         $eventMap = [
             0 => [
@@ -55,9 +55,9 @@ class EventFactory
             ? is_array($eventMap[$payload->op])
                 ? array_key_exists($payload->t, $eventMap[$payload->op])
                     ? $eventMap[$payload->op][$payload->t]()
-                    : new NullEvent()
+                    : new NullEventHandler()
                 : $eventMap[$payload->op]()
-            : new NullEvent();
+            : new NullEventHandler();
 
         return $event->prepare($payload->d);
     }
