@@ -49,7 +49,7 @@ class Caroler
     /**
      * @var \Ratchet\Client\WebSocket Application WebSocket connection
      */
-    public $connection;
+    private $connection;
 
     /**
      * @var int Last received sequence number
@@ -109,14 +109,20 @@ class Caroler
         $this->loop->run();
     }
 
+    /**
+     * @return \React\EventLoop\LoopInterface
+     */
     public function getLoop(): LoopInterface
     {
         return $this->loop;
     }
 
+    public function getConnection(): WebSocket
+    {
+        return $this->connection;
+    }
+
     /**
-     * Sets the current state of the application.
-     *
      * @param \GiorgioStokje\Caroler\State $state
      *
      * @return \GiorgioStokje\Caroler\Caroler

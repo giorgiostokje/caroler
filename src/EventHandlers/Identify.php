@@ -31,7 +31,7 @@ class Identify extends AbstractEventHandler implements EventHandlerInterface
         $caroler->write("Emitting heartbeat to the Gateway every "
             . round($this->heartbeatInterval / 1000, 2) . " seconds.");
 
-        $caroler->connection->send(json_encode([
+        $caroler->getConnection()->send(json_encode([
             'op' => 2,
             'd' => [
                 'token' => $caroler->token,

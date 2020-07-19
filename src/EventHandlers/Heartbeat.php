@@ -19,7 +19,7 @@ class Heartbeat extends AbstractEventHandler implements EventHandlerInterface
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {
-        $caroler->connection->send(json_encode([
+        $caroler->getConnection()->send(json_encode([
             'op' => 1,
             'd' => $caroler->sequence,
         ]));
