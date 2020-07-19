@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler;
+namespace GiorgioStokje\Caroler\Factories;
 
 use GiorgioStokje\Caroler\EventHandlers\DispatchEvents\MessageCreate;
 use GiorgioStokje\Caroler\EventHandlers\DispatchEvents\Ready;
@@ -17,7 +17,7 @@ use stdClass;
 /**
  * Event factory class
  *
- * @package GiorgioStokje\Caroler
+ * @package GiorgioStokje\Caroler\Events
  */
 class EventHandlerFactory
 {

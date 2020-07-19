@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GiorgioStokje\Caroler;
 
 use Exception;
+use GiorgioStokje\Caroler\Factories\EventHandlerFactory;
 use GiorgioStokje\Caroler\Objects\Message;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -56,14 +57,14 @@ class Caroler
     private $commandPrefix;
 
     /**
-     * @var bool Debugging mode
-     */
-    private $debug;
-
-    /**
      * @var array Available Commands
      */
     private $commands = [];
+
+    /**
+     * @var bool Debugging mode
+     */
+    private $debug;
 
     /**
      * @var \React\EventLoop\LoopInterface Application event loop
