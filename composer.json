@@ -1,0 +1,23 @@
+{
+    "name": "giorgiostokje/caroler",
+    "description": "Extensible Discord bot with optional Laravel integration.",
+    "type": "library",
+    "license": "GNU GPLv3",
+    "authors": [
+        {
+            "name": "Giorgio Stokje",
+            "email": "giorgio.stokje@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "react/event-loop": "^1.1",
+        "react/socket": "^1.5",
+        "ratchet/pawl": "^0.3.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "GiorgioStokje\\Caroler\\": "src"
+        }
+    }
+}
