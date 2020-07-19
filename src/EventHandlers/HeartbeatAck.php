@@ -18,6 +18,7 @@ class HeartbeatAck extends AbstractEventHandler implements EventHandlerInterface
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {
+        $caroler->setHeartbeatAcknowledged(true);
         $caroler->write("Heartbeat acknowledged by the Gateway.", true);
 
         return $this;

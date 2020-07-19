@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace GiorgioStokje\Caroler\EventHandlers;
 
 use GiorgioStokje\Caroler\Caroler;
+use React\EventLoop\Timer\Timer;
 
 /**
  * Identify Event class
@@ -24,9 +25,19 @@ class Identify extends AbstractEventHandler implements EventHandlerInterface
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {
-        $caroler->getLoop()->addPeriodicTimer($this->heartbeatInterval / 1000, function () use ($caroler) {
-            (new Heartbeat())->handle($caroler);
-        });
+        $caroler->setHeartbeatAcknowledged(true);
+
+        $currTimer = $caroler->getHeartbeatTimer();
+        if (isset($currTimer)) {
+            $caroler->setHeartbeatTimer(null);
+        }
+
+        $caroler->getLoop()
+            ->addPeriodicTimer($this->heartbeatInterval / 1000, function (Timer $timer) use ($caroler) {
+                $caroler->setHeartbeatTimer($timer);
+
+                (new Heartbeat())->handle($caroler);
+            });
 
         $caroler->write("Emitting heartbeat to the Gateway every "
             . round($this->heartbeatInterval / 1000, 2) . " seconds.");

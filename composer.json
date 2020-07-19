@@ -1,6 +1,6 @@
 {
     "name": "giorgiostokje/caroler",
-    "description": "Extensible Discord bot with optional Laravel integration.",
+    "description": "An extensible Discord bot with optional Laravel integration.",
     "type": "library",
     "license": "GNU GPLv3",
     "authors": [

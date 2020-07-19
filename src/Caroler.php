@@ -13,6 +13,7 @@ use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\MessageInterface;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\Timer;
 use React\Socket\Connector as ReactConnector;
 
 /**
@@ -75,6 +76,16 @@ class Caroler
     private $connection;
 
     /**
+     * @var \React\EventLoop\Timer\Timer Heartbeat Timer instance
+     */
+    private $heartbeatTimer = null;
+
+    /**
+     * @var int Whether or not the previous heartbeat was acknowledged.
+     */
+    private $heartbeatAcknowledged = false;
+
+    /**
      * @var int|null Last received sequence number
      */
     private $sequence;
@@ -121,10 +132,8 @@ class Caroler
                 && $filename !== 'AbstractCommand.php'
             ) {
                 $class = __NAMESPACE__ . '\Commands\\' . str_replace('.php', '', $filename);
-
                 /** @var \GiorgioStokje\Caroler\Commands\CommandInterface $command */
                 $command = new $class();
-
                 $this->commands[$command->getSignature()] = $class = get_class($command);
 
                 $this->write("Registered \"{$command->getSignature()}\" Command from $class.", true);
@@ -132,6 +141,8 @@ class Caroler
                 unset($command);
             }
         }
+
+        $this->write(count($this->commands) . " Command(s) registered.");
 
         return $this;
     }
@@ -172,6 +183,19 @@ class Caroler
         );
 
         $this->loop->run();
+    }
+
+    /**
+     * Closes the Gateway connection and stops the application event loop.
+     *
+     * @return \GiorgioStokje\Caroler\Caroler
+     */
+    public function conclude(): Caroler
+    {
+        $this->connection->close(1006);
+        $this->loop->stop();
+
+        return $this;
     }
 
     /**
@@ -222,9 +246,60 @@ class Caroler
         return $this->connection;
     }
 
+    /**
+     * @return \React\EventLoop\Timer\Timer|null
+     */
+    public function getHeartbeatTimer(): ?Timer
+    {
+        return $this->heartbeatTimer;
+    }
+
+    /**
+     * @param \React\EventLoop\Timer\Timer|null $timer
+     *
+     * @return \GiorgioStokje\Caroler\Caroler
+     */
+    public function setHeartbeatTimer(?Timer $timer): Caroler
+    {
+        $this->heartbeatTimer = $timer;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getHeartbeatAcknowledged(): bool
+    {
+        return $this->heartbeatAcknowledged;
+    }
+
+    /**
+     * @param bool $acknowledged
+     *
+     * @return $this
+     */
+    public function setHeartbeatAcknowledged(bool $acknowledged): Caroler
+    {
+        $this->heartbeatAcknowledged = $acknowledged;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
     public function getSequence(): ?int
     {
         return $this->sequence;
+    }
+
+    /**
+     * @return \GiorgioStokje\Caroler\State
+     */
+    public function getState(): State
+    {
+        return $this->state;
     }
 
     /**

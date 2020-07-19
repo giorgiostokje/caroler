@@ -11,6 +11,7 @@ use GiorgioStokje\Caroler\EventHandlers\Heartbeat;
 use GiorgioStokje\Caroler\EventHandlers\HeartbeatAck;
 use GiorgioStokje\Caroler\EventHandlers\Identify;
 use GiorgioStokje\Caroler\EventHandlers\NullEventHandler;
+use GiorgioStokje\Caroler\EventHandlers\Reconnect;
 use stdClass;
 
 /**
@@ -41,12 +42,12 @@ class EventHandlerFactory
             1 => function () {
                 return new Heartbeat();
             },
-//            7 => function () {
-//
-//            },
-//            9 => function () {
-//
-//            },
+            7 => function () {
+                return new Reconnect();
+            },
+            9 => function () {
+                return new Identify();
+            },
             10 => function () {
                 return new Identify();
             },
