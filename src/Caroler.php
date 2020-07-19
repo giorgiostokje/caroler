@@ -34,7 +34,7 @@ class Caroler
      * @var string Discord bot token
      * @see https://discord.com/developers/applications/
      */
-    public $token;
+    private $token;
 
     /**
      * @var bool Debugging mode
@@ -107,6 +107,14 @@ class Caroler
         );
 
         $this->loop->run();
+    }
+
+    /**
+     * @return string
+     */
+    public function getToken(): string
+    {
+        return $this->token;
     }
 
     /**

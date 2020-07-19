@@ -34,7 +34,7 @@ class Identify extends AbstractEventHandler implements EventHandlerInterface
         $caroler->getConnection()->send(json_encode([
             'op' => 2,
             'd' => [
-                'token' => $caroler->token,
+                'token' => $caroler->getToken(),
                 'properties' => [
                     '$os' => 'Linux',
                     '$browser' => 'Caroler',
