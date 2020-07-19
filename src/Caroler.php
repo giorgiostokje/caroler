@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GiorgioStokje\Caroler;
 
+use DirectoryIterator;
 use Exception;
 use GiorgioStokje\Caroler\Factories\EventHandlerFactory;
 use GiorgioStokje\Caroler\Objects\Message;
@@ -55,6 +56,11 @@ class Caroler
      * @var string Chat command prefix
      */
     private $commandPrefix;
+
+    /**
+     * @var \DirectoryIterator[] Directories containing Command classes
+     */
+    private $commandDirs = [];
 
     /**
      * @var array Available Commands
@@ -114,32 +120,95 @@ class Caroler
         $this->commandPrefix = $options['command_prefix'] ?? '!';
         $this->debug = $options['debug'] ?? false;
 
-        $this->registerCommands();
+        if (isset($options['command_dirs'])) {
+            foreach ($options['command_dirs'] as $commandDir) {
+                try {
+                    $this->loadCommands($commandDir);
+                } catch (Exception $e) {
+                    $this->write($e->getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Loads the Commands from the provided directory.
+     *
+     * @param string $dir
+     *
+     * @return \GiorgioStokje\Caroler\Caroler
+     * @throws \Exception
+     */
+    public function loadCommands(string $dir): Caroler
+    {
+        if (!is_dir($dir)) {
+            throw new Exception("Failed to load commands. \"$dir\" is not a valid directory.");
+        }
+
+        $this->commandDirs[] = new DirectoryIterator($dir);
+
+        return $this;
     }
 
     /**
      * Register's the bot's commands.
      *
      * @return \GiorgioStokje\Caroler\Caroler
+     * @see https://stackoverflow.com/questions/7153000/get-class-name-from-file/44654073
      */
     private function registerCommands(): Caroler
     {
         $this->write("Registering Commands...");
 
-        foreach (scandir(dirname(__FILE__) . '/Commands') as $filename) {
-            if (
-                substr($filename, -4) === '.php'
-                && $filename !== 'CommandInterface.php'
-                && $filename !== 'AbstractCommand.php'
-            ) {
-                $class = __NAMESPACE__ . '\Commands\\' . str_replace('.php', '', $filename);
-                /** @var \GiorgioStokje\Caroler\Commands\CommandInterface $command */
-                $command = new $class();
-                $this->commands[$command->getSignature()] = $class = get_class($command);
+        foreach ($this->commandDirs as $dirContents) {
+            foreach ($dirContents as $file) {
+                if (substr($file->getPathname(), -4) === '.php') {
+                    $fp = fopen($file->getPathname(), 'r');
+                    $class = $namespace = $buffer = '';
+                    $i = 0;
 
-                $this->write("Registered \"{$command->getSignature()}\" Command from $class.", true);
+                    while (!$class) {
+                        if (feof($fp)) {
+                            break;
+                        }
 
-                unset($command);
+                        $buffer .= fread($fp, 512);
+                        $tokens = token_get_all($buffer);
+
+                        if (strpos($buffer, '{') === false) {
+                            continue;
+                        }
+
+                        for (; $i < count($tokens); $i++) {
+                            if ($tokens[$i][0] === T_NAMESPACE) {
+                                for ($j = $i + 1; $j < count($tokens); $j++) {
+                                    if ($tokens[$j][0] === T_STRING) {
+                                        $namespace .= '\\' . $tokens[$j][1];
+                                    } elseif ($tokens[$j] === '{' || $tokens[$j] === ';') {
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if ($tokens[$i][0] === T_CLASS) {
+                                for ($j = $i + 1; $j < count($tokens); $j++) {
+                                    if ($tokens[$j] === '{') {
+                                        $class = $tokens[$i + 2][1];
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $class = "$namespace\\$class";
+                    /** @var \GiorgioStokje\Caroler\Commands\CommandInterface $command */
+                    $command = new $class();
+                    $this->commands[$command->getSignature()] = get_class($command);
+
+                    $this->write("Registered \"{$command->getSignature()}\" Command from $class.", true);
+
+                    unset($command);
+                }
             }
         }
 
@@ -157,6 +226,8 @@ class Caroler
      */
     public function sing(): void
     {
+        $this->registerCommands();
+
         $this->loop = Factory::create();
         $rConnector = new ReactConnector($this->loop);
         $connector = new Connector($this->loop, $rConnector);

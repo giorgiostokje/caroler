@@ -55,7 +55,7 @@ class MessageCreate extends AbstractEventHandler implements EventHandlerInterfac
             $command = $caroler->getCommands()[$cmd];
             /** @var \GiorgioStokje\Caroler\Commands\CommandInterface $command */
             $command = new $command();
-            $command->prepare($this->message, $caroler)->execute();
+            $command->prepare($this->message, $caroler)->handle();
         }
 
         return $this;

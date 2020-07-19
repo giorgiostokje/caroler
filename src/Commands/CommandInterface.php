@@ -36,5 +36,5 @@ interface CommandInterface
      *
      * @return bool
      */
-    public function execute(): bool;
+    public function handle(): bool;
 }

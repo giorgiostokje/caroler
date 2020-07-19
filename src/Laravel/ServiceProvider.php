@@ -36,6 +36,11 @@ class ServiceProvider extends LaravelServiceProvider
      */
     public function boot()
     {
-        $this->publishes([__DIR__ . '/config.php' => config_path('caroler.php')]);
+        $this->publishes([
+            __DIR__ . '/config.php' => config_path('caroler.php'),
+            dirname(__FILE__, 3) . '/examples/Commands/Dice.php' => app_path('Caroler/Commands/Dice.php'),
+            dirname(__FILE__, 3) . '/examples/Laravel/Console/Commands/CarolerSing.php'
+                => app_path('Console/Commands/CarolerSing.php'),
+        ]);
     }
 }

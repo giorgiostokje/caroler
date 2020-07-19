@@ -12,8 +12,18 @@ use GiorgioStokje\Caroler\Objects\Message;
  *
  * @package GiorgioStokje\Caroler\Commands
  */
-abstract class AbstractCommand implements CommandInterface
+abstract class Command implements CommandInterface
 {
+    /**
+     * @var string Command signature
+     */
+    protected $signature;
+
+    /**
+     * @var string Command description
+     */
+    protected $description;
+
     /**
      * @var \GiorgioStokje\Caroler\Objects\Message Message Object
      */

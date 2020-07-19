@@ -13,6 +13,11 @@ return [
     // Default: !
     'command_prefix' => '!',
 
+    // Directories containing Command classes. The Commands in these directories will always be automatically loaded.
+    'command_dirs' => [
+        app_path('Caroler/Commands'),
+    ],
+
     // Whether or not debugging mode is enabled. Debugging mode will show additional info in the console.
     // Options: true|false
     // Default: false
