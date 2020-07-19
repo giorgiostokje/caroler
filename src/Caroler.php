@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace GiorgioStokje\Caroler;
 
 use Exception;
+use GiorgioStokje\Caroler\Objects\Message;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\MessageInterface;
@@ -31,15 +34,35 @@ class Caroler
     private const DISCORD_GATEWAY_VERSION = 6;
 
     /**
+     * @var string Discord REST API URL
+     */
+    private const DISCORD_API_URL = 'https://discord.com/api/';
+
+    /**
+     * @var \GuzzleHttp\Client Application HTTP client
+     */
+    private $httpClient;
+
+    /**
      * @var string Discord bot token
      * @see https://discord.com/developers/applications/
      */
     private $token;
 
     /**
+     * @var string Chat command prefix
+     */
+    private $commandPrefix;
+
+    /**
      * @var bool Debugging mode
      */
     private $debug;
+
+    /**
+     * @var array Available Commands
+     */
+    private $commands = [];
 
     /**
      * @var \React\EventLoop\LoopInterface Application event loop
@@ -69,8 +92,48 @@ class Caroler
      */
     public function __construct(string $token, array $options = [])
     {
-        $this->token = $token;
+        $this->httpClient = new Client([
+            'base_uri' => self::DISCORD_API_URL,
+            'headers' => [
+                'Authorization' => 'Bot ' . $this->token = $token
+            ]
+        ]);
+
+        $this->commandPrefix = $options['command_prefix'] ?? '!';
         $this->debug = $options['debug'] ?? false;
+
+        $this->registerCommands();
+    }
+
+    /**
+     * Register's the bot's commands.
+     *
+     * @return \GiorgioStokje\Caroler\Caroler
+     */
+    private function registerCommands(): Caroler
+    {
+        $this->write("Registering Commands...");
+
+        foreach (scandir(dirname(__FILE__) . '/Commands') as $filename) {
+            if (
+                substr($filename, -4) === '.php'
+                && $filename !== 'CommandInterface.php'
+                && $filename !== 'AbstractCommand.php'
+            ) {
+                $class = __NAMESPACE__ . '\Commands\\' . str_replace('.php', '', $filename);
+
+                /** @var \GiorgioStokje\Caroler\Commands\CommandInterface $command */
+                $command = new $class();
+
+                $this->commands[$command->getSignature()] = $class = get_class($command);
+
+                $this->write("Registered \"{$command->getSignature()}\" Command from $class.", true);
+
+                unset($command);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -92,6 +155,8 @@ class Caroler
             function (WebSocket $conn) {
                 $this->connection = $conn;
                 $this->connection->on('message', function (MessageInterface $payload) {
+                    $this->write("Payload received from the Gateway:\n$payload", true);
+
                     $payload = json_decode($payload->getPayload());
                     $this->sequence = $payload->s;
 
@@ -110,11 +175,35 @@ class Caroler
     }
 
     /**
+     * @return \GuzzleHttp\Client
+     */
+    public function getHttpClient(): Client
+    {
+        return $this->httpClient;
+    }
+
+    /**
      * @return string
      */
     public function getToken(): string
     {
         return $this->token;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCommandPrefix(): string
+    {
+        return $this->commandPrefix;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCommands(): array
+    {
+        return $this->commands;
     }
 
     /**
@@ -151,15 +240,42 @@ class Caroler
     }
 
     /**
+     * Sends a message to a channel.
+     *
+     * @param string $msg
+     * @param \GiorgioStokje\Caroler\Objects\Message $context
+     *
+     * @return $this
+     */
+    public function send(string $msg, Message $context): Caroler
+    {
+        try {
+            $this->httpClient->post("channels/$context->channelId/messages", [
+                'json' => [
+                    'content' => $msg
+                ]
+            ]);
+        } catch (GuzzleException $e) {
+            $this->write($e->getMessage(), true);
+        }
+
+        return $this;
+    }
+
+    /**
      * Writes a message to the console.
      *
      * @param string $msg
      * @param bool $debug
+     *
+     * @return \GiorgioStokje\Caroler\Caroler
      */
-    public function write(string $msg, bool $debug = false)
+    public function write(string $msg, bool $debug = false): Caroler
     {
         $prefix = $debug ? "DEBUG: " : "";
 
         !(($this->debug && $debug) || !$debug) ?: printf("[%s] %s%s\n", date("Y/m/d H:i:s"), $prefix, $msg);
+
+        return $this;
     }
 }

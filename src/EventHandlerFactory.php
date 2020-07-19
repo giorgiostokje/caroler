@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace GiorgioStokje\Caroler;
 
+use GiorgioStokje\Caroler\EventHandlers\DispatchEvents\MessageCreate;
 use GiorgioStokje\Caroler\EventHandlers\DispatchEvents\Ready;
 use GiorgioStokje\Caroler\EventHandlers\EventHandlerInterface;
 use GiorgioStokje\Caroler\EventHandlers\Heartbeat;
@@ -32,7 +33,10 @@ class EventHandlerFactory
             0 => [
                 'READY' => function () {
                     return new Ready();
-                }
+                },
+                'MESSAGE_CREATE' => function () {
+                    return new MessageCreate();
+                },
             ],
             1 => function () {
                 return new Heartbeat();

@@ -15,120 +15,120 @@ class Message extends AbstractObject implements ObjectInterface
     /**
      * @var string Message id
      */
-    protected $id;
+    public $id;
 
     /**
      * @var string Message channel id
      */
-    protected $channelId;
+    public $channelId;
 
     /**
      * @var string Message guild id
      */
-    protected $guildId;
+    public $guildId;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\User Message author
      */
-    protected $author;
+    public $author;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\GuildMember Message author's member properties
      */
-    protected $member;
+    public $member;
 
     /**
      * @var string Message contents
      */
-    protected $content;
+    public $content;
 
     /**
      * @var string Message sent timestamp
      */
-    protected $timestamp;
+    public $timestamp;
 
     /**
      * @var string|null Message edited timestamp
      */
-    protected $editedTimestamp;
+    public $editedTimestamp;
 
     /**
      * @var bool Whether message was TTS
      */
-    protected $tts;
+    public $tts;
 
     /**
      * @var bool Whether message mentions everyone
      */
-    protected $mentionEveryone;
+    public $mentionEveryone;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\User[] Message user mentions
      */
-    protected $mentions;
+    public $mentions;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\Role[] Message role mentions
      */
-    protected $mentionRoles;
+    public $mentionRoles;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\ChannelMention[] Message role mentions
      */
-    protected $mentionChannels;
+    public $mentionChannels;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\Attachment[] Message file attachments
      */
-    protected $attachments;
+    public $attachments;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\Embed[] Message embedded content
      */
-    protected $embeds;
+    public $embeds;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\Reaction[] Message reactions
      */
-    protected $reactions;
+    public $reactions;
 
     /**
      * @var int|string Used for validating a message was sent.
      */
-    protected $nonce;
+    public $nonce;
 
     /**
      * @var bool Whether message is pinned
      */
-    protected $pinned;
+    public $pinned;
 
     /**
      * @var string Message webhook id
      */
-    protected $webhookId;
+    public $webhookId;
 
     /**
      * @var int Message type
      */
-    protected $type;
+    public $type;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\MessageActivity
      */
-    protected $activity;
+    public $activity;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\MessageApplication
      */
-    protected $application;
+    public $application;
 
     /**
      * @var \GiorgioStokje\Caroler\Objects\MessageReference
      */
-    protected $messageReference;
+    public $messageReference;
 
     /**
      * @var int Message flags
      */
-    protected $flags;
+    public $flags;
 }
