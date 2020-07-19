@@ -9,6 +9,7 @@ use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\MessageInterface;
 use React\EventLoop\Factory;
+use React\EventLoop\LoopInterface;
 use React\Socket\Connector as ReactConnector;
 
 /**
@@ -43,7 +44,7 @@ class Caroler
     /**
      * @var \React\EventLoop\LoopInterface Application event loop
      */
-    public $loop;
+    private $loop;
 
     /**
      * @var \Ratchet\Client\WebSocket Application WebSocket connection
@@ -106,6 +107,11 @@ class Caroler
         );
 
         $this->loop->run();
+    }
+
+    public function getLoop(): LoopInterface
+    {
+        return $this->loop;
     }
 
     /**

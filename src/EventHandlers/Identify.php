@@ -24,7 +24,7 @@ class Identify extends AbstractEventHandler implements EventHandlerInterface
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {
-        $caroler->loop->addPeriodicTimer($this->heartbeatInterval / 1000, function () use ($caroler) {
+        $caroler->getLoop()->addPeriodicTimer($this->heartbeatInterval / 1000, function () use ($caroler) {
             (new Heartbeat())->handle($caroler);
         });
 
