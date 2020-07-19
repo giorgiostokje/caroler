@@ -52,7 +52,7 @@ class Caroler
     private $connection;
 
     /**
-     * @var int Last received sequence number
+     * @var int|null Last received sequence number
      */
     private $sequence;
 
@@ -133,7 +133,7 @@ class Caroler
         return $this->connection;
     }
 
-    public function getSequence(): int
+    public function getSequence(): ?int
     {
         return $this->sequence;
     }
