@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Commands;
+namespace App\Caroler\Commands;
+
+use GiorgioStokje\Caroler\Commands\Command;
 
 /**
  * Dice Command class
  *
- * @package GiorgioStokje\Caroler\Commands
+ * @package GiorgioStokje\Caroler\Examples
  */
-class Dice extends AbstractCommand implements CommandInterface
+class Dice extends Command
 {
     /**
      * @var string Command signature
@@ -17,9 +19,14 @@ class Dice extends AbstractCommand implements CommandInterface
     protected $signature = 'dice';
 
     /**
+     * @var string Command description
+     */
+    protected $description = 'Rolls a dice.';
+
+    /**
      * @inheritDoc
      */
-    public function execute(): bool
+    public function handle(): bool
     {
         $number = rand(1, 6);
 
