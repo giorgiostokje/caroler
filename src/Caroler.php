@@ -226,7 +226,7 @@ class Caroler
      */
     public function sing(): void
     {
-        $this->registerCommands();
+        !empty($this->registerCommands()) ?: $this->registerCommands();
 
         $this->loop = Factory::create();
         $rConnector = new ReactConnector($this->loop);
