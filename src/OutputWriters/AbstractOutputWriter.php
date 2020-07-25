@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Caroler\Writers;
+namespace Caroler\OutputWriters;
 
 /**
- * Common Writer functionality
+ * Common OutputWriter functionality
  *
- * @package Caroler\Writers
+ * @package Caroler\OutputWriters
  */
-abstract class AbstractWriter implements WriterInterface
+abstract class AbstractOutputWriter implements OutputWriterInterface
 {
     /**
      * Validates that messages are strings.
      *
      * @param string|string[] $messages
      *
-     * @return \Caroler\Writers\WriterInterface
+     * @return \Caroler\OutputWriters\OutputWriterInterface
      */
-    protected function validateMessages($messages): WriterInterface
+    protected function validateMessages($messages): OutputWriterInterface
     {
         if (!is_string($messages) && !is_array($messages)) {
             throw new \InvalidArgumentException("Message must be a string or an array!");
@@ -40,9 +40,9 @@ abstract class AbstractWriter implements WriterInterface
      *
      * @param string|null $type
      *
-     * @return \Caroler\Writers\WriterInterface
+     * @return \Caroler\OutputWriters\OutputWriterInterface
      */
-    protected function validateMessageType(?string $type): WriterInterface
+    protected function validateMessageType(?string $type): OutputWriterInterface
     {
         if (!is_null($type) && !in_array($type, ['info', 'comment', 'question', 'error'])) {
             throw new \InvalidArgumentException("Invalid message type provided!");

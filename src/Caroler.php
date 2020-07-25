@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Caroler;
 
-use Caroler\Writers\DiscordWriter;
+use Caroler\OutputWriters\DiscordOutputWriter;
 use DirectoryIterator;
 use Exception;
 use Caroler\Factories\EventHandlerFactory;
 use Caroler\Objects\Message;
-use Caroler\Writers\WriterFactory;
+use Caroler\OutputWriters\OutputWriterFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Ratchet\Client\Connector;
@@ -105,9 +105,9 @@ class Caroler
     private $state;
 
     /**
-     * @var \Caroler\Writers\WriterInterface[] $writer
+     * @var \Caroler\OutputWriters\OutputWriterInterface[] System output writers
      */
-    private $writers = [];
+    private $outputWriters = [];
 
     /**
      * Constructs the client.
@@ -117,7 +117,13 @@ class Caroler
      */
     public function __construct(string $token, array $options = [])
     {
-        !isset($options['system_channel']) ?: $this->setWriter(new DiscordWriter($options['system_channel'], $this));
+        if (
+            isset($options['system_channel'])
+            && !is_null($options['system_channel'])
+            && $options['system_channel'] !== ''
+        ) {
+            $this->setOutputWriter(new DiscordOutputWriter($options['system_channel'], $this));
+        }
 
         $this->httpClient = new Client([
             'base_uri' => self::DISCORD_API_URL,
@@ -235,7 +241,7 @@ class Caroler
      */
     public function sing(): void
     {
-        !empty($this->writers) ?: $this->setWriter('console');
+        !empty($this->outputWriters) ?: $this->setOutputWriter('console');
         !empty($this->registerCommands()) ?: $this->registerCommands();
 
         $this->loop = Factory::create();
@@ -425,31 +431,31 @@ class Caroler
     }
 
     // =========================================================================
-    // Writer
+    // Output Writer
     // =========================================================================
 
     /**
      * Gets the output writers.
      *
-     * @return \Caroler\Writers\WriterInterface[]
+     * @return \Caroler\OutputWriters\OutputWriterInterface[]
      * @api
      */
-    public function getWriter(): array
+    public function getOutputWriters(): array
     {
-        return $this->writers;
+        return $this->outputWriters;
     }
 
     /**
      * Sets an output writer.
      *
-     * @param string|\Caroler\Writers\WriterInterface|\Symfony\Component\Console\Output\OutputInterface $writer
+     * @param string|\Caroler\OutputWriters\OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\Caroler
      * @api
      */
-    public function setWriter($writer): Caroler
+    public function setOutputWriter($outputWriter): Caroler
     {
-        $this->writers[] = WriterFactory::make($writer);
+        $this->outputWriters[] = OutputWriterFactory::make($outputWriter);
 
         return $this;
     }
@@ -457,28 +463,28 @@ class Caroler
     /**
      * Sets an output writer.
      *
-     * @param string|\Caroler\Writers\WriterInterface|\Symfony\Component\Console\Output\OutputInterface $writer
+     * @param string|\Caroler\OutputWriters\OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\Caroler
      * @api
      */
-    public function writer($writer): Caroler
+    public function outputWriter($outputWriter): Caroler
     {
-        return $this->setWriter($writer);
+        return $this->setOutputWriter($outputWriter);
     }
 
     /**
      * Sets multiple output writers.
      *
-     * @param array[] $writers
+     * @param array[] $outputWriters
      *
      * @return \Caroler\Caroler
      */
-    public function writers(array $writers): Caroler
+    public function outputWriters(array $outputWriters): Caroler
     {
-        /** @var string|\Caroler\Writers\WriterInterface|\Symfony\Component\Console\Output\OutputInterface $writer */
-        foreach ($writers as $writer) {
-            $this->setWriter($writer);
+        /** @var string|\Caroler\OutputWriters\OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter */
+        foreach ($outputWriters as $outputWriter) {
+            $this->setOutputWriter($outputWriter);
         }
 
         return $this;
@@ -496,9 +502,9 @@ class Caroler
      */
     public function write($messages, bool $debug = false, string $type = null): Caroler
     {
-        foreach ($this->writers as $writer) {
+        foreach ($this->outputWriters as $outputWriter) {
             if (!$debug || ($this->debug && $debug)) {
-                $writer->write($messages, $type);
+                $outputWriter->write($messages, $type);
             }
         }
 

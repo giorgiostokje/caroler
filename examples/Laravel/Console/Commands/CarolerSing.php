@@ -38,7 +38,7 @@ class CarolerSing extends Command
      */
     public function handle()
     {
-        Caroler::sing();
+        Caroler::outputWriter($this->getOutput())->sing();
 
         return 0;
     }

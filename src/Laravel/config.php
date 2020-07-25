@@ -18,6 +18,10 @@ return [
         app_path('Caroler/Commands'),
     ],
 
+    // Id of the channel used for system events.
+    // Default: <empty>
+    'system_channel' => '',
+
     // Whether or not debugging mode is enabled. Debugging mode will show additional info in the console.
     // Options: true|false
     // Default: false
