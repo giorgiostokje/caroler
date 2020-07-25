@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Caroler\Commands;
 
-use GiorgioStokje\Caroler\Commands\Command;
+use Caroler\Commands\Command;
 
 /**
  * Dice Command class
  *
- * @package GiorgioStokje\Caroler\Examples
+ * @package Caroler\Examples
  */
 class Dice extends Command
 {

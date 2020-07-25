@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Objects;
+namespace Caroler\Objects;
 
 use stdClass;
 
 /**
  * User Object class
  *
- * @package GiorgioStokje\Caroler\Objects
+ * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/user#user-object
  */
 class User extends AbstractObject implements ObjectInterface

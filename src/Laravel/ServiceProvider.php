@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Laravel;
+namespace Caroler\Laravel;
 
-use GiorgioStokje\Caroler\Caroler;
+use Caroler\Caroler;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
 /**
  * Service Provider for Laravel
  *
- * @package GiorgioStokje\Caroler\Laravel
+ * @package Caroler\Laravel
  */
 class ServiceProvider extends LaravelServiceProvider
 {

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\EventHandlers;
+namespace Caroler\EventHandlers;
 
-use GiorgioStokje\Caroler\Traits\Populatable;
+use Caroler\Traits\Populatable;
 use stdClass;
 
 /**
  * Common Event functionality
  *
- * @package GiorgioStokje\Caroler\EventHandlers
+ * @package Caroler\EventHandlers
  */
 abstract class AbstractEventHandler implements EventHandlerInterface
 {

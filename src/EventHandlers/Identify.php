@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\EventHandlers;
+namespace Caroler\EventHandlers;
 
-use GiorgioStokje\Caroler\Caroler;
+use Caroler\Caroler;
 use React\EventLoop\Timer\Timer;
 
 /**
  * Identify Event class
  *
- * @package GiorgioStokje\Caroler\EventHandlers
+ * @package Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#identify
  */
 class Identify extends AbstractEventHandler implements EventHandlerInterface

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler;
+namespace Caroler;
 
-use GiorgioStokje\Caroler\Objects\User;
+use Caroler\Objects\User;
 
 /**
  * Represents the current state of the application.
  *
  * The state is populated from the received Ready event, after the initial handshake with the Gateway.
  *
- * @package GiorgioStokje\Caroler
+ * @package Caroler
  * @see https://discord.com/developers/docs/topics/gateway#ready
  */
 class State
@@ -22,7 +22,7 @@ class State
     private $v;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\User Information about the user
+     * @var \Caroler\Objects\User Information about the user
      */
     private $user;
 
@@ -32,7 +32,7 @@ class State
     private $privateChannels;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\Guild[] Guilds the bot is in
+     * @var \Caroler\Objects\Guild[] Guilds the bot is in
      */
     private $guilds;
 
@@ -57,7 +57,7 @@ class State
     /**
      * @param int $v
      *
-     * @return \GiorgioStokje\Caroler\State
+     * @return \Caroler\State
      */
     public function setV(int $v)
     {
@@ -67,7 +67,7 @@ class State
     }
 
     /**
-     * @return \GiorgioStokje\Caroler\Objects\User
+     * @return \Caroler\Objects\User
      */
     public function getUser(): User
     {
@@ -75,9 +75,9 @@ class State
     }
 
     /**
-     * @param \GiorgioStokje\Caroler\Objects\User $user
+     * @param \Caroler\Objects\User $user
      *
-     * @return \GiorgioStokje\Caroler\State
+     * @return \Caroler\State
      */
     public function setUser(User $user)
     {
@@ -97,7 +97,7 @@ class State
     /**
      * @param array $privateChannels
      *
-     * @return \GiorgioStokje\Caroler\State
+     * @return \Caroler\State
      */
     public function setPrivateChannels(array $privateChannels)
     {
@@ -107,7 +107,7 @@ class State
     }
 
     /**
-     * @return \GiorgioStokje\Caroler\Objects\Guild[]
+     * @return \Caroler\Objects\Guild[]
      */
     public function getGuilds(): array
     {
@@ -115,9 +115,9 @@ class State
     }
 
     /**
-     * @param \GiorgioStokje\Caroler\Objects\Guild[] $guilds
+     * @param \Caroler\Objects\Guild[] $guilds
      *
-     * @return \GiorgioStokje\Caroler\State
+     * @return \Caroler\State
      */
     public function setGuilds(array $guilds)
     {
@@ -137,7 +137,7 @@ class State
     /**
      * @param string $sessionId
      *
-     * @return \GiorgioStokje\Caroler\State
+     * @return \Caroler\State
      */
     public function setSessionId(string $sessionId)
     {
@@ -157,7 +157,7 @@ class State
     /**
      * @param int[]|null $shard
      *
-     * @return \GiorgioStokje\Caroler\State
+     * @return \Caroler\State
      */
     public function setShard(?array $shard)
     {

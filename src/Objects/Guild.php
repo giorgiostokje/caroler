@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Objects;
+namespace Caroler\Objects;
 
 class Guild extends AbstractObject implements ObjectInterface
 {

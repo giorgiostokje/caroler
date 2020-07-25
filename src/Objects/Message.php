@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Objects;
+namespace Caroler\Objects;
 
 /**
  * Channel Object class
  *
- * @package GiorgioStokje\Caroler\Objects
+ * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/channel#message-object
  */
 class Message extends AbstractObject implements ObjectInterface
@@ -28,12 +28,12 @@ class Message extends AbstractObject implements ObjectInterface
     public $guildId;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\User Message author
+     * @var \Caroler\Objects\User Message author
      */
     public $author;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\GuildMember Message author's member properties
+     * @var \Caroler\Objects\GuildMember Message author's member properties
      */
     public $member;
 
@@ -63,32 +63,32 @@ class Message extends AbstractObject implements ObjectInterface
     public $mentionEveryone;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\User[] Message user mentions
+     * @var \Caroler\Objects\User[] Message user mentions
      */
     public $mentions;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\Role[] Message role mentions
+     * @var \Caroler\Objects\Role[] Message role mentions
      */
     public $mentionRoles;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\ChannelMention[] Message role mentions
+     * @var \Caroler\Objects\ChannelMention[] Message role mentions
      */
     public $mentionChannels;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\Attachment[] Message file attachments
+     * @var \Caroler\Objects\Attachment[] Message file attachments
      */
     public $attachments;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\Embed[] Message embedded content
+     * @var \Caroler\Objects\Embed[] Message embedded content
      */
     public $embeds;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\Reaction[] Message reactions
+     * @var \Caroler\Objects\Reaction[] Message reactions
      */
     public $reactions;
 
@@ -113,17 +113,17 @@ class Message extends AbstractObject implements ObjectInterface
     public $type;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\MessageActivity
+     * @var \Caroler\Objects\MessageActivity
      */
     public $activity;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\MessageApplication
+     * @var \Caroler\Objects\MessageApplication
      */
     public $application;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\MessageReference
+     * @var \Caroler\Objects\MessageReference
      */
     public $messageReference;
 

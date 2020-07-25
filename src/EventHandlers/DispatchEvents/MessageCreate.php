@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\EventHandlers\DispatchEvents;
+namespace Caroler\EventHandlers\DispatchEvents;
 
-use GiorgioStokje\Caroler\Caroler;
-use GiorgioStokje\Caroler\EventHandlers\AbstractEventHandler;
-use GiorgioStokje\Caroler\EventHandlers\EventHandlerInterface;
-use GiorgioStokje\Caroler\Objects\Message;
+use Caroler\Caroler;
+use Caroler\EventHandlers\AbstractEventHandler;
+use Caroler\EventHandlers\EventHandlerInterface;
+use Caroler\Objects\Message;
 use stdClass;
 
 /**
  * Message Create Event handler class
  *
- * @package GiorgioStokje\Caroler\EventHandlers\DispatchEvents
+ * @package Caroler\EventHandlers\DispatchEvents
  * @see https://discord.com/developers/docs/topics/gateway#message-create
  */
 class MessageCreate extends AbstractEventHandler implements EventHandlerInterface
 {
     /**
-     * @var \GiorgioStokje\Caroler\Objects\Message Created Message object
+     * @var \Caroler\Objects\Message Created Message object
      */
     private $message;
 
@@ -53,7 +53,7 @@ class MessageCreate extends AbstractEventHandler implements EventHandlerInterfac
 
         if (isset($cmd) && isset($caroler->getCommands()[$cmd])) {
             $command = $caroler->getCommands()[$cmd];
-            /** @var \GiorgioStokje\Caroler\Commands\CommandInterface $command */
+            /** @var \Caroler\Commands\CommandInterface $command */
             $command = new $command();
             $command->prepare($this->message, $caroler)->handle();
         }

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Laravel;
+namespace Caroler\Laravel;
 
 use Illuminate\Support\Facades\Facade as LaravelFacade;
 
 /**
  * Facade
  *
- * @package GiorgioStokje\Caroler\Laravel
+ * @package Caroler\Laravel
  */
 class Facade extends LaravelFacade
 {

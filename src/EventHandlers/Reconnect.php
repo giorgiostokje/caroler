@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\EventHandlers;
+namespace Caroler\EventHandlers;
 
-use GiorgioStokje\Caroler\Caroler;
+use Caroler\Caroler;
 
 class Reconnect extends AbstractEventHandler implements EventHandlerInterface
 {

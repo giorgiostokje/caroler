@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\EventHandlers;
+namespace Caroler\EventHandlers;
 
-use GiorgioStokje\Caroler\Caroler;
+use Caroler\Caroler;
 use stdClass;
 
 /**
  * Unimplemented Event handler class
  *
- * @package GiorgioStokje\Caroler\EventHandlers
+ * @package Caroler\EventHandlers
  */
 class NullEventHandler implements EventHandlerInterface
 {

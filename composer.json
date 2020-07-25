@@ -11,26 +11,27 @@
     ],
     "minimum-stability": "stable",
     "require": {
+        "guzzlehttp/guzzle": "^6.3",
+        "ratchet/pawl": "^0.3.4",
         "react/event-loop": "^1.1",
         "react/socket": "^1.5",
-        "ratchet/pawl": "^0.3.4",
-        "guzzlehttp/guzzle": "^6.3"
+        "symfony/console": "^5.1"
     },
     "config": {
         "sort-packages": true
     },
     "autoload": {
         "psr-4": {
-            "GiorgioStokje\\Caroler\\": "src"
+            "Caroler\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "GiorgioStokje\\Caroler\\Laravel\\ServiceProvider"
+                "Caroler\\Laravel\\ServiceProvider"
             ],
             "aliases": {
-                "Caroler": "GiorgioStokje\\Caroler\\Laravel\\Facade"
+                "Caroler": "Caroler\\Laravel\\Facade"
             }
         }
     }

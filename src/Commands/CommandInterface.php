@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Commands;
+namespace Caroler\Commands;
 
-use GiorgioStokje\Caroler\Caroler;
-use GiorgioStokje\Caroler\Objects\Message;
+use Caroler\Caroler;
+use Caroler\Objects\Message;
 
 /**
  * Common Command interface
  *
- * @package GiorgioStokje\Caroler\Commands
+ * @package Caroler\Commands
  */
 interface CommandInterface
 {
@@ -24,10 +24,10 @@ interface CommandInterface
     /**
      * Prepares the command before execution.
      *
-     * @param \GiorgioStokje\Caroler\Objects\Message $message
-     * @param \GiorgioStokje\Caroler\Caroler $caroler
+     * @param \Caroler\Objects\Message $message
+     * @param \Caroler\Caroler $caroler
      *
-     * @return \GiorgioStokje\Caroler\Commands\CommandInterface
+     * @return \Caroler\Commands\CommandInterface
      */
     public function prepare(Message $message, Caroler $caroler): CommandInterface;
 

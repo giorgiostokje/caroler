@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Objects;
+namespace Caroler\Objects;
 
 use stdClass;
 
@@ -10,7 +10,7 @@ use stdClass;
  * Common object interface
  * All Objects MUST implement this interface!
  *
- * @package GiorgioStokje\Caroler\Objects
+ * @package Caroler\Objects
  */
 interface ObjectInterface
 {
@@ -19,7 +19,7 @@ interface ObjectInterface
      *
      * @param \stdClass $data
      *
-     * @return \GiorgioStokje\Caroler\Objects\ObjectInterface
+     * @return \Caroler\Objects\ObjectInterface
      */
     public function prepare(stdClass $data): ObjectInterface;
 }

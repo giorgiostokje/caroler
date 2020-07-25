@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\EventHandlers\DispatchEvents;
+namespace Caroler\EventHandlers\DispatchEvents;
 
-use GiorgioStokje\Caroler\Caroler;
-use GiorgioStokje\Caroler\EventHandlers\AbstractEventHandler;
-use GiorgioStokje\Caroler\EventHandlers\EventHandlerInterface;
-use GiorgioStokje\Caroler\Objects\User;
-use GiorgioStokje\Caroler\State;
+use Caroler\Caroler;
+use Caroler\EventHandlers\AbstractEventHandler;
+use Caroler\EventHandlers\EventHandlerInterface;
+use Caroler\Objects\User;
+use Caroler\State;
 
 /**
  * Ready Event handler class
  *
- * @package GiorgioStokje\Caroler\EventHandlers
+ * @package Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#ready
  */
 class Ready extends AbstractEventHandler implements EventHandlerInterface

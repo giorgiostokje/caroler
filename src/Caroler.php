@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler;
+namespace Caroler;
 
+use Caroler\Writers\DiscordWriter;
 use DirectoryIterator;
 use Exception;
-use GiorgioStokje\Caroler\Factories\EventHandlerFactory;
-use GiorgioStokje\Caroler\Objects\Message;
+use Caroler\Factories\EventHandlerFactory;
+use Caroler\Objects\Message;
+use Caroler\Writers\WriterFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Ratchet\Client\Connector;
@@ -21,7 +23,7 @@ use React\Socket\Connector as ReactConnector;
 /**
  * Application entry point
  *
- * @package GiorgioStokje\Caroler
+ * @package Caroler
  */
 class Caroler
 {
@@ -98,9 +100,14 @@ class Caroler
     private $sequence;
 
     /**
-     * @var \GiorgioStokje\Caroler\State Current state of the application
+     * @var \Caroler\State Current state of the application
      */
     private $state;
+
+    /**
+     * @var \Caroler\Writers\WriterInterface[] $writer
+     */
+    private $writers = [];
 
     /**
      * Constructs the client.
@@ -110,6 +117,8 @@ class Caroler
      */
     public function __construct(string $token, array $options = [])
     {
+        !isset($options['system_channel']) ?: $this->setWriter(new DiscordWriter($options['system_channel'], $this));
+
         $this->httpClient = new Client([
             'base_uri' => self::DISCORD_API_URL,
             'headers' => [
@@ -136,7 +145,7 @@ class Caroler
      *
      * @param string $dir
      *
-     * @return \GiorgioStokje\Caroler\Caroler
+     * @return \Caroler\Caroler
      * @throws \Exception
      */
     public function loadCommands(string $dir): Caroler
@@ -153,7 +162,7 @@ class Caroler
     /**
      * Register's the bot's commands.
      *
-     * @return \GiorgioStokje\Caroler\Caroler
+     * @return \Caroler\Caroler
      * @see https://stackoverflow.com/questions/7153000/get-class-name-from-file/44654073
      */
     private function registerCommands(): Caroler
@@ -201,7 +210,7 @@ class Caroler
                     }
 
                     $class = "$namespace\\$class";
-                    /** @var \GiorgioStokje\Caroler\Commands\CommandInterface $command */
+                    /** @var \Caroler\Commands\CommandInterface $command */
                     $command = new $class();
                     $this->commands[$command->getSignature()] = get_class($command);
 
@@ -212,7 +221,7 @@ class Caroler
             }
         }
 
-        $this->write(count($this->commands) . " Command(s) registered.");
+        $this->write(count($this->commands) . " Command(s) registered.", false, 'info');
 
         return $this;
     }
@@ -226,6 +235,7 @@ class Caroler
      */
     public function sing(): void
     {
+        !empty($this->writers) ?: $this->setWriter('console');
         !empty($this->registerCommands()) ?: $this->registerCommands();
 
         $this->loop = Factory::create();
@@ -260,7 +270,7 @@ class Caroler
     /**
      * Closes the Gateway connection and stops the application event loop.
      *
-     * @return \GiorgioStokje\Caroler\Caroler
+     * @return \Caroler\Caroler
      */
     public function conclude(): Caroler
     {
@@ -329,7 +339,7 @@ class Caroler
     /**
      * @param \React\EventLoop\Timer\Timer|null $timer
      *
-     * @return \GiorgioStokje\Caroler\Caroler
+     * @return \Caroler\Caroler
      */
     public function setHeartbeatTimer(?Timer $timer): Caroler
     {
@@ -367,7 +377,7 @@ class Caroler
     }
 
     /**
-     * @return \GiorgioStokje\Caroler\State
+     * @return \Caroler\State
      */
     public function getState(): State
     {
@@ -375,9 +385,9 @@ class Caroler
     }
 
     /**
-     * @param \GiorgioStokje\Caroler\State $state
+     * @param \Caroler\State $state
      *
-     * @return \GiorgioStokje\Caroler\Caroler
+     * @return \Caroler\Caroler
      */
     public function setState(State $state): Caroler
     {
@@ -389,19 +399,24 @@ class Caroler
     /**
      * Sends a message to a channel.
      *
-     * @param string $msg
-     * @param \GiorgioStokje\Caroler\Objects\Message $context
+     * @param string $message
+     * @param \Caroler\Objects\Message|string $context Message object or channel id
      *
      * @return $this
      */
-    public function send(string $msg, Message $context): Caroler
+    public function send(string $message, $context): Caroler
     {
+        if (!$context instanceof Message && !is_string($context)) {
+            throw new \InvalidArgumentException("Context must be a Message object or string!");
+        }
+
+        $channelId = $context instanceof Message ? $context->channelId : $context;
+
         try {
-            $this->httpClient->post("channels/$context->channelId/messages", [
-                'json' => [
-                    'content' => $msg
-                ]
-            ]);
+            $this->httpClient->post(
+                "channels/" . $channelId . "/messages",
+                ['json' => ['content' => $message]]
+            );
         } catch (GuzzleException $e) {
             $this->write($e->getMessage(), true);
         }
@@ -409,19 +424,83 @@ class Caroler
         return $this;
     }
 
-    /**
-     * Writes a message to the console.
-     *
-     * @param string $msg
-     * @param bool $debug
-     *
-     * @return \GiorgioStokje\Caroler\Caroler
-     */
-    public function write(string $msg, bool $debug = false): Caroler
-    {
-        $prefix = $debug ? "DEBUG: " : "";
+    // =========================================================================
+    // Writer
+    // =========================================================================
 
-        !(($this->debug && $debug) || !$debug) ?: printf("[%s] %s%s\n", date("Y/m/d H:i:s"), $prefix, $msg);
+    /**
+     * Gets the output writers.
+     *
+     * @return \Caroler\Writers\WriterInterface[]
+     * @api
+     */
+    public function getWriter(): array
+    {
+        return $this->writers;
+    }
+
+    /**
+     * Sets an output writer.
+     *
+     * @param string|\Caroler\Writers\WriterInterface|\Symfony\Component\Console\Output\OutputInterface $writer
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function setWriter($writer): Caroler
+    {
+        $this->writers[] = WriterFactory::make($writer);
+
+        return $this;
+    }
+
+    /**
+     * Sets an output writer.
+     *
+     * @param string|\Caroler\Writers\WriterInterface|\Symfony\Component\Console\Output\OutputInterface $writer
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function writer($writer): Caroler
+    {
+        return $this->setWriter($writer);
+    }
+
+    /**
+     * Sets multiple output writers.
+     *
+     * @param array[] $writers
+     *
+     * @return \Caroler\Caroler
+     */
+    public function writers(array $writers): Caroler
+    {
+        /** @var string|\Caroler\Writers\WriterInterface|\Symfony\Component\Console\Output\OutputInterface $writer */
+        foreach ($writers as $writer) {
+            $this->setWriter($writer);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Writes one or more messages to the output writer.
+     *
+     * @param string|string[] $messages
+     * @param bool $debug
+     * @param string|null $type info|comment|question|error
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function write($messages, bool $debug = false, string $type = null): Caroler
+    {
+        foreach ($this->writers as $writer) {
+            if (!$debug || ($this->debug && $debug)) {
+                $writer->write($messages, $type);
+            }
+        }
 
         return $this;
     }

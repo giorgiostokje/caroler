@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Traits;
+namespace Caroler\Traits;
 
 use stdClass;
 
 /**
  * Helper for classes that can be populated with pre-existing data.
  *
- * @package GiorgioStokje\Caroler\Traits
+ * @package Caroler\Traits
  */
 trait Populatable
 {

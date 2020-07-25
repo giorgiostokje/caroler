@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\EventHandlers;
+namespace Caroler\EventHandlers;
 
-use GiorgioStokje\Caroler\Caroler;
+use Caroler\Caroler;
 
 /**
  * Heartbeat Event (handler) class
  *
- * @package GiorgioStokje\Caroler\EventHandlers
+ * @package Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#heartbeat
  */
 class Heartbeat extends AbstractEventHandler implements EventHandlerInterface

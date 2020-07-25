@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Commands;
+namespace Caroler\Commands;
 
-use GiorgioStokje\Caroler\Caroler;
-use GiorgioStokje\Caroler\Objects\Message;
+use Caroler\Caroler;
+use Caroler\Objects\Message;
 
 /**
  * Common Command functionality
  *
- * @package GiorgioStokje\Caroler\Commands
+ * @package Caroler\Commands
  */
 abstract class Command implements CommandInterface
 {
@@ -25,12 +25,12 @@ abstract class Command implements CommandInterface
     protected $description;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\Message Message Object
+     * @var \Caroler\Objects\Message Message Object
      */
     protected $message;
 
     /**
-     * @var \GiorgioStokje\Caroler\Caroler Application instance
+     * @var \Caroler\Caroler Application instance
      */
     protected $caroler;
 

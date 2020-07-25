@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Factories;
+namespace Caroler\Factories;
 
-use GiorgioStokje\Caroler\EventHandlers\DispatchEvents\MessageCreate;
-use GiorgioStokje\Caroler\EventHandlers\DispatchEvents\Ready;
-use GiorgioStokje\Caroler\EventHandlers\EventHandlerInterface;
-use GiorgioStokje\Caroler\EventHandlers\Heartbeat;
-use GiorgioStokje\Caroler\EventHandlers\HeartbeatAck;
-use GiorgioStokje\Caroler\EventHandlers\Identify;
-use GiorgioStokje\Caroler\EventHandlers\NullEventHandler;
-use GiorgioStokje\Caroler\EventHandlers\Reconnect;
+use Caroler\EventHandlers\DispatchEvents\MessageCreate;
+use Caroler\EventHandlers\DispatchEvents\Ready;
+use Caroler\EventHandlers\EventHandlerInterface;
+use Caroler\EventHandlers\Heartbeat;
+use Caroler\EventHandlers\HeartbeatAck;
+use Caroler\EventHandlers\Identify;
+use Caroler\EventHandlers\NullEventHandler;
+use Caroler\EventHandlers\Reconnect;
 use stdClass;
 
 /**
  * Event factory class
  *
- * @package GiorgioStokje\Caroler\Events
+ * @package Caroler\Events
  */
 class EventHandlerFactory
 {
@@ -26,7 +26,7 @@ class EventHandlerFactory
      *
      * @param \stdClass $payload
      *
-     * @return \GiorgioStokje\Caroler\EventHandlers\EventHandlerInterface
+     * @return \Caroler\EventHandlers\EventHandlerInterface
      */
     public static function make(stdClass $payload): EventHandlerInterface
     {

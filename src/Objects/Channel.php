@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Objects;
+namespace Caroler\Objects;
 
 /**
  * Channel Object class
  *
- * @package GiorgioStokje\Caroler\Objects
+ * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/channel#message-object
  */
 class Channel extends AbstractObject implements ObjectInterface
@@ -33,7 +33,7 @@ class Channel extends AbstractObject implements ObjectInterface
     protected $position;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\Overwrite[] Explicit member and role permission overwrites
+     * @var \Caroler\Objects\Overwrite[] Explicit member and role permission overwrites
      */
     protected $permissionOverwrites;
 
@@ -73,7 +73,7 @@ class Channel extends AbstractObject implements ObjectInterface
     protected $rateLimitPerUser;
 
     /**
-     * @var \GiorgioStokje\Caroler\Objects\User[] DM recipients
+     * @var \Caroler\Objects\User[] DM recipients
      */
     protected $recipients;
 

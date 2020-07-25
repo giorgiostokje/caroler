@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace GiorgioStokje\Caroler\Objects;
+namespace Caroler\Objects;
 
-use GiorgioStokje\Caroler\Traits\Populatable;
+use Caroler\Traits\Populatable;
 use stdClass;
 
 /**
  * Common Object functionality
  *
- * @package GiorgioStokje\Caroler\Objects
+ * @package Caroler\Objects
  */
 abstract class AbstractObject implements ObjectInterface
 {
