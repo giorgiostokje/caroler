@@ -11,7 +11,7 @@ use Caroler\Objects\Message;
 use stdClass;
 
 /**
- * Message Create Event handler class
+ * MESSAGE_CREATE event handler class
  *
  * @package Caroler\EventHandlers\DispatchEvents
  * @see https://discord.com/developers/docs/topics/gateway#message-create
@@ -43,6 +43,13 @@ class MessageCreate extends AbstractEventHandler implements EventHandlerInterfac
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {
+        if (
+            (isset($this->message->author->bot) && $this->message->author->bot)
+            || (isset($this->message->author->system) && $this->message->author->system)
+        ) {
+            return $this;
+        }
+
         if (
             substr(
                 $this->message->content,

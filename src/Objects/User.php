@@ -7,26 +7,26 @@ namespace Caroler\Objects;
 use stdClass;
 
 /**
- * User Object class
+ * User object class
  *
  * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/user#user-object
  */
 class User extends AbstractObject implements ObjectInterface
 {
-    protected $id;
-    protected $username;
-    protected $discriminator;
-    protected $avatar;
-    protected $bot;
-    protected $system;
-    protected $mfaEnabled;
-    protected $locale;
-    protected $verified;
-    protected $email;
-    protected $flags;
-    protected $premiumType;
-    protected $publicFlags;
+    public $id;
+    public $username;
+    public $discriminator;
+    public $avatar;
+    public $bot;
+    public $system;
+    public $mfaEnabled;
+    public $locale;
+    public $verified;
+    public $email;
+    public $flags;
+    public $premiumType;
+    public $publicFlags;
 
     /**
      * @inheritDoc
