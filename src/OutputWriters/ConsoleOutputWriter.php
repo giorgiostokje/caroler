@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Caroler\Writers;
+namespace Caroler\OutputWriters;
 
 /**
- * ConsoleWriter class
+ * ConsoleOutputWriter class
  *
- * @package Caroler\Writers
+ * @package Caroler\OutputWriters
  */
-class ConsoleWriter extends AbstractWriter implements WriterInterface
+class ConsoleOutputWriter extends AbstractOutputWriter implements OutputWriterInterface
 {
     /**
      * @inheritDoc
      */
-    public function write($messages, string $type = null): WriterInterface
+    public function write($messages, string $type = null): OutputWriterInterface
     {
         $messages = $this->process($messages, $type);
 

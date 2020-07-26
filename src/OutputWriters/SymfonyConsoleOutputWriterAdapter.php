@@ -2,36 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Caroler\Writers;
+namespace Caroler\OutputWriters;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * SymfonyConsoleOutputWriterAdapter class
  *
- * @package Caroler\Writers
+ * @package Caroler\OutputWriters
  */
-class SymfonyConsoleOutputWriterAdapter extends AbstractWriter implements WriterInterface
+class SymfonyConsoleOutputWriterAdapter extends AbstractOutputWriter implements OutputWriterInterface
 {
     /**
      * @var \Symfony\Component\Console\Output\OutputInterface Symfony Console Output interface
      */
-    private $writer;
+    private $outputWriter;
 
     /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $writer
+     * @param \Symfony\Component\Console\Output\OutputInterface $outputWriter
      */
-    public function __construct(OutputInterface $writer)
+    public function __construct(OutputInterface $outputWriter)
     {
-        $this->writer = $writer;
+        $this->outputWriter = $outputWriter;
     }
 
     /**
      * @inheritDoc
      */
-    public function write($messages, string $type = null): WriterInterface
+    public function write($messages, string $type = null): OutputWriterInterface
     {
-        $this->writer->writeln(
+        $this->outputWriter->writeln(
             $this->validateMessages($messages)->validateMessageType($type)->formatMessages($messages, $type)
         );
 

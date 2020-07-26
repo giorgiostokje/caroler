@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Caroler\Writers;
+namespace Caroler\OutputWriters;
 
 use Caroler\Caroler;
 
 /**
- * DiscordWriter class
+ * DiscordOutputWriter class
  *
- * @package Caroler\Writers
+ * @package Caroler\OutputWriters
  */
-class DiscordWriter extends AbstractWriter implements WriterInterface
+class DiscordOutputWriter extends AbstractOutputWriter implements OutputWriterInterface
 {
     /**
      * @var string Id of the channel to write to
@@ -36,7 +36,7 @@ class DiscordWriter extends AbstractWriter implements WriterInterface
     /**
      * @inheritDoc
      */
-    public function write($messages, string $type = null): WriterInterface
+    public function write($messages, string $type = null): OutputWriterInterface
     {
         $messages = $this->process($messages, $type);
 
