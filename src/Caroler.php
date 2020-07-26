@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Caroler;
 
+use Caroler\Exceptions\TokenNotFoundException;
 use Caroler\OutputWriters\DiscordOutputWriter;
-use DirectoryIterator;
+use Caroler\OutputWriters\OutputWriterInterface;
+use Caroler\Stores\CommandStore;
+use Caroler\Stores\ConfigStore;
 use Exception;
 use Caroler\Factories\EventHandlerFactory;
 use Caroler\Objects\Message;
 use Caroler\OutputWriters\OutputWriterFactory;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\MessageInterface;
@@ -44,40 +48,29 @@ class Caroler
     private const DISCORD_API_URL = 'https://discord.com/api/';
 
     /**
+     * @var \Caroler\Stores\ConfigStore Available configuration options
+     */
+    private $configStore;
+
+    /**
+     * @var \Caroler\OutputWriters\OutputWriterInterface[] System output writers
+     */
+    private $outputWriters = [];
+
+    /**
+     * @var \Caroler\Stores\CommandStore Available bot commands
+     */
+    private $commandStore;
+
+    /**
      * @var \GuzzleHttp\Client Application HTTP client
      */
     private $httpClient;
 
     /**
-     * @var string Discord bot token
-     * @see https://discord.com/developers/applications/
-     */
-    private $token;
-
-    /**
-     * @var string Chat command prefix
-     */
-    private $commandPrefix;
-
-    /**
-     * @var \DirectoryIterator[] Directories containing Command classes
-     */
-    private $commandDirs = [];
-
-    /**
-     * @var array Available Commands
-     */
-    private $commands = [];
-
-    /**
-     * @var bool Debugging mode
-     */
-    private $debug;
-
-    /**
      * @var \React\EventLoop\LoopInterface Application event loop
      */
-    private $loop;
+    private $eventLoop;
 
     /**
      * @var \Ratchet\Client\WebSocket Application WebSocket connection
@@ -105,131 +98,33 @@ class Caroler
     private $state;
 
     /**
-     * @var \Caroler\OutputWriters\OutputWriterInterface[] System output writers
-     */
-    private $outputWriters = [];
-
-    /**
-     * Constructs the client.
-     *
-     * @param string $token
      * @param array $options
+     *
+     * @throws \Caroler\Exceptions\TokenNotFoundException
      */
-    public function __construct(string $token, array $options = [])
+    public function __construct(array $options = [])
     {
-        if (
-            isset($options['system_channel'])
-            && !is_null($options['system_channel'])
-            && $options['system_channel'] !== ''
-        ) {
-            $this->setOutputWriter(new DiscordOutputWriter($options['system_channel'], $this));
+        $this->configStore = new ConfigStore();
+        $this->configureOptions($options);
+        if (!$this->optionExists('token')) {
+            throw new TokenNotFoundException("No Discord Bot Token defined!");
+        }
+        $this->optionExists('command_prefix') ?: $this->configureOption('command_prefix', '!');
+        $this->optionExists('debug') ?: $this->configureOption('debug', false);
+
+        if ($this->optionExists('system_channel') && $this->getOption('system_channel') !== '') {
+            $this->setOutputWriter(new DiscordOutputWriter($this->getOption('system_channel'), $this));
         }
 
         $this->httpClient = new Client([
             'base_uri' => self::DISCORD_API_URL,
             'headers' => [
-                'Authorization' => 'Bot ' . $this->token = $token
+                'Authorization' => 'Bot ' . $this->getOption('token')
             ]
         ]);
 
-        $this->commandPrefix = $options['command_prefix'] ?? '!';
-        $this->debug = $options['debug'] ?? false;
-
-        if (isset($options['command_dirs'])) {
-            foreach ($options['command_dirs'] as $commandDir) {
-                try {
-                    $this->loadCommands($commandDir);
-                } catch (Exception $e) {
-                    $this->write($e->getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * Loads the Commands from the provided directory.
-     *
-     * @param string $dir
-     *
-     * @return \Caroler\Caroler
-     * @throws \Exception
-     */
-    public function loadCommands(string $dir): Caroler
-    {
-        if (!is_dir($dir)) {
-            throw new Exception("Failed to load commands. \"$dir\" is not a valid directory.");
-        }
-
-        $this->commandDirs[] = new DirectoryIterator($dir);
-
-        return $this;
-    }
-
-    /**
-     * Register's the bot's commands.
-     *
-     * @return \Caroler\Caroler
-     * @see https://stackoverflow.com/questions/7153000/get-class-name-from-file/44654073
-     */
-    private function registerCommands(): Caroler
-    {
-        $this->write("Registering Commands...");
-
-        foreach ($this->commandDirs as $dirContents) {
-            foreach ($dirContents as $file) {
-                if (substr($file->getPathname(), -4) === '.php') {
-                    $fp = fopen($file->getPathname(), 'r');
-                    $class = $namespace = $buffer = '';
-                    $i = 0;
-
-                    while (!$class) {
-                        if (feof($fp)) {
-                            break;
-                        }
-
-                        $buffer .= fread($fp, 512);
-                        $tokens = token_get_all($buffer);
-
-                        if (strpos($buffer, '{') === false) {
-                            continue;
-                        }
-
-                        for (; $i < count($tokens); $i++) {
-                            if ($tokens[$i][0] === T_NAMESPACE) {
-                                for ($j = $i + 1; $j < count($tokens); $j++) {
-                                    if ($tokens[$j][0] === T_STRING) {
-                                        $namespace .= '\\' . $tokens[$j][1];
-                                    } elseif ($tokens[$j] === '{' || $tokens[$j] === ';') {
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if ($tokens[$i][0] === T_CLASS) {
-                                for ($j = $i + 1; $j < count($tokens); $j++) {
-                                    if ($tokens[$j] === '{') {
-                                        $class = $tokens[$i + 2][1];
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    $class = "$namespace\\$class";
-                    /** @var \Caroler\Commands\CommandInterface $command */
-                    $command = new $class();
-                    $this->commands[$command->getSignature()] = get_class($command);
-
-                    $this->write("Registered \"{$command->getSignature()}\" Command from $class.", true);
-
-                    unset($command);
-                }
-            }
-        }
-
-        $this->write(count($this->commands) . " Command(s) registered.", false, 'info');
-
-        return $this;
+        $this->commandStore = new CommandStore();
+        $this->registerCommands($this->getOption('commands'));
     }
 
     /**
@@ -242,11 +137,10 @@ class Caroler
     public function sing(): void
     {
         !empty($this->outputWriters) ?: $this->setOutputWriter('console');
-        !empty($this->registerCommands()) ?: $this->registerCommands();
 
-        $this->loop = Factory::create();
-        $rConnector = new ReactConnector($this->loop);
-        $connector = new Connector($this->loop, $rConnector);
+        $this->eventLoop = Factory::create();
+        $rConnector = new ReactConnector($this->eventLoop);
+        $connector = new Connector($this->eventLoop, $rConnector);
 
         $this->write("Connecting to the Discord Gateway...");
 
@@ -254,8 +148,6 @@ class Caroler
             function (WebSocket $conn) {
                 $this->connection = $conn;
                 $this->connection->on('message', function (MessageInterface $payload) {
-                    $this->write("Payload received from the Gateway:\n$payload", true);
-
                     $payload = json_decode($payload->getPayload());
                     $this->sequence = $payload->s;
 
@@ -266,11 +158,11 @@ class Caroler
                 $this->write("Failed to connect!");
                 $this->write($e->getMessage(), true);
 
-                $this->loop->stop();
+                $this->eventLoop->stop();
             }
         );
 
-        $this->loop->run();
+        $this->eventLoop->run();
     }
 
     /**
@@ -281,49 +173,17 @@ class Caroler
     public function conclude(): Caroler
     {
         $this->connection->close(1006);
-        $this->loop->stop();
+        $this->eventLoop->stop();
 
         return $this;
     }
 
     /**
-     * @return \GuzzleHttp\Client
-     */
-    public function getHttpClient(): Client
-    {
-        return $this->httpClient;
-    }
-
-    /**
-     * @return string
-     */
-    public function getToken(): string
-    {
-        return $this->token;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCommandPrefix(): string
-    {
-        return $this->commandPrefix;
-    }
-
-    /**
-     * @return array
-     */
-    public function getCommands(): array
-    {
-        return $this->commands;
-    }
-
-    /**
      * @return \React\EventLoop\LoopInterface
      */
-    public function getLoop(): LoopInterface
+    public function getEventLoop(): LoopInterface
     {
-        return $this->loop;
+        return $this->eventLoop;
     }
 
     /**
@@ -413,7 +273,7 @@ class Caroler
     public function send(string $message, $context): Caroler
     {
         if (!$context instanceof Message && !is_string($context)) {
-            throw new \InvalidArgumentException("Context must be a Message object or string!");
+            throw new \InvalidArgumentException("Context must be either a Message object or a string!");
         }
 
         $channelId = $context instanceof Message ? $context->channelId : $context;
@@ -423,15 +283,106 @@ class Caroler
                 "channels/" . $channelId . "/messages",
                 ['json' => ['content' => $message]]
             );
-        } catch (GuzzleException $e) {
-            $this->write($e->getMessage(), true);
+        } catch (RequestException $e) {
+            $this->write("Failed to send message: " . Psr7\str($e->getRequest()));
+            if ($e->hasResponse()) {
+                $this->write("Discord responded with: " . Psr7\str($e->getResponse()));
+            }
         }
 
         return $this;
     }
 
     // =========================================================================
-    // Output Writer
+    // Config
+    // =========================================================================
+
+    /**
+     * Determines whether or not an option was configured.
+     *
+     * @param string $option
+     *
+     * @return bool
+     */
+    public function optionExists(string $option): bool
+    {
+        return $this->configStore->exists($option);
+    }
+
+    /**
+     * Retrieves a configuration option.
+     *
+     * @param string $option
+     *
+     * @return mixed
+     */
+    public function getOption(string $option)
+    {
+        return $this->configStore->get($option);
+    }
+
+    /**
+     * Configures an option.
+     *
+     * @param string $option
+     * @param mixed $value
+     *
+     * @return $this
+     * @api
+     */
+    public function configureOption(string $option, $value): Caroler
+    {
+        $this->configStore->set($option, $value);
+
+        return $this;
+    }
+
+    /**
+     * Configures multiple options.
+     *
+     * @param array $options
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function configureOptions(array $options): Caroler
+    {
+        foreach ($options as $option => $value) {
+            !is_string($option) && !is_string($value) ?: $this->configureOption($option, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Configures an option.
+     *
+     * @param string $option
+     * @param mixed $value
+     *
+     * @return $this
+     * @api
+     */
+    public function option(string $option, $value): Caroler
+    {
+        return $this->configureOption($option, $value);
+    }
+
+    /**
+     * Configures multiple options.
+     *
+     * @param array $options
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function options(array $options): Caroler
+    {
+        return $this->configureOptions($options);
+    }
+
+    // =========================================================================
+    // Output Writers
     // =========================================================================
 
     /**
@@ -448,7 +399,7 @@ class Caroler
     /**
      * Sets an output writer.
      *
-     * @param string|\Caroler\OutputWriters\OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
+     * @param string|OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\Caroler
      * @api
@@ -461,9 +412,26 @@ class Caroler
     }
 
     /**
+     * Sets multiple output writers.
+     *
+     * @param array[] $outputWriters
+     *
+     * @return \Caroler\Caroler
+     */
+    public function setOutputWriters(array $outputWriters): Caroler
+    {
+        /** @var string|OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter */
+        foreach ($outputWriters as $outputWriter) {
+            $this->setOutputWriter($outputWriter);
+        }
+
+        return $this;
+    }
+
+    /**
      * Sets an output writer.
      *
-     * @param string|\Caroler\OutputWriters\OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
+     * @param string|OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\Caroler
      * @api
@@ -479,15 +447,11 @@ class Caroler
      * @param array[] $outputWriters
      *
      * @return \Caroler\Caroler
+     * @api
      */
     public function outputWriters(array $outputWriters): Caroler
     {
-        /** @var string|\Caroler\OutputWriters\OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter */
-        foreach ($outputWriters as $outputWriter) {
-            $this->setOutputWriter($outputWriter);
-        }
-
-        return $this;
+        return $this->setOutputWriters($outputWriters);
     }
 
     /**
@@ -503,11 +467,109 @@ class Caroler
     public function write($messages, bool $debug = false, string $type = null): Caroler
     {
         foreach ($this->outputWriters as $outputWriter) {
-            if (!$debug || ($this->debug && $debug)) {
+            if (!$debug || ($this->getOption('debug') && $debug)) {
                 $outputWriter->write($messages, $type);
             }
         }
 
         return $this;
+    }
+
+    // =========================================================================
+    // Commands
+    // =========================================================================
+
+    /**
+     * Determines whether or not a command exists.
+     *
+     * @param string $signature
+     *
+     * @return bool
+     */
+    public function commandExists(string $signature): bool
+    {
+        return $this->commandStore->exists($signature);
+    }
+
+    /**
+     * Retrieves a command class' name.
+     *
+     * @param string $signature
+     *
+     * @return string|null
+     */
+    public function getCommand(string $signature): ?string
+    {
+        return $this->commandStore->get($signature);
+    }
+
+    /**
+     * Registers a bot command.
+     *
+     * @param string $class
+     * @param string|null $signature
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function registerCommand(string $class, string $signature = null): Caroler
+    {
+        try {
+            /** @var \Caroler\Commands\CommandInterface $command */
+            $command = new $class();
+            $signature = !is_null($signature) && is_string($signature) ? $signature : $command->getSignature();
+            unset($command);
+        } catch (Exception $e) {
+            throw new \InvalidArgumentException("Invalid command class \"$class\"!");
+        }
+
+        $this->commandStore->set($signature, $class);
+        $this->write("Command \"$signature\" registered.", false, 'info');
+
+        return $this;
+    }
+
+    /**
+     * Registers multiple bot commands.
+     *
+     * @param array $commands As [<'signature' => >'command_class', ...]
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function registerCommands(array $commands): Caroler
+    {
+        foreach ($commands as $signature => $command) {
+            $this->registerCommand($command, $signature);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Registers a bot command.
+     *
+     * @param string $class
+     * @param string|null $signature
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function command(string $class, string $signature = null): Caroler
+    {
+        return $this->registerCommand($class, $signature);
+    }
+
+    /**
+     * Registers multiple bot commands.
+     *
+     * @param array $commands As [<'signature' => >'command_class', ...]
+     *
+     * @return \Caroler\Caroler
+     * @api
+     */
+    public function commands(array $commands): Caroler
+    {
+        return $this->registerCommands($commands);
     }
 }

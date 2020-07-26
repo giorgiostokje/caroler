@@ -27,7 +27,7 @@ class Resume extends AbstractEventHandler implements EventHandlerInterface
         $caroler->getConnection()->send(json_encode([
             'op' => 6,
             'd' => [
-                'token' => $caroler->getToken(),
+                'token' => $caroler->getOption('token'),
                 'session_id' => $caroler->getState()->getSessionId(),
                 'seq' => $caroler->getSequence()
             ]

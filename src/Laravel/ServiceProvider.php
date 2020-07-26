@@ -25,7 +25,7 @@ class ServiceProvider extends LaravelServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/config.php', 'caroler');
 
         App::bind('caroler', function () {
-            return new Caroler(config('caroler.token'), config('caroler'));
+            return new Caroler(config('caroler'));
         });
     }
 

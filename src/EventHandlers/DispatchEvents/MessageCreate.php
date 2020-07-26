@@ -43,16 +43,22 @@ class MessageCreate extends AbstractEventHandler implements EventHandlerInterfac
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {
-        if (substr($this->message->content, 0, strlen($caroler->getCommandPrefix())) === $caroler->getCommandPrefix()) {
-            $cmd = substr(
+        if (
+            substr(
+                $this->message->content,
+                0,
+                strlen($caroler->getOption('command_prefix'))
+            ) === $caroler->getOption('command_prefix')
+        ) {
+            $signature = substr(
                 strtok($this->message->content, ' '),
-                strlen($caroler->getCommandPrefix()),
-                strlen(strtok($this->message->content, ' ')) - strlen($caroler->getCommandPrefix())
+                strlen($caroler->getOption('command_prefix')),
+                strlen(strtok($this->message->content, ' ')) - strlen($caroler->getOption('command_prefix'))
             );
         }
 
-        if (isset($cmd) && isset($caroler->getCommands()[$cmd])) {
-            $command = $caroler->getCommands()[$cmd];
+        if (isset($signature) && $caroler->commandExists($signature)) {
+            $command = $caroler->getCommand($signature);
             /** @var \Caroler\Commands\CommandInterface $command */
             $command = new $command();
             $command->prepare($this->message, $caroler)->handle();

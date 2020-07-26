@@ -32,7 +32,7 @@ class Identify extends AbstractEventHandler implements EventHandlerInterface
             $caroler->setHeartbeatTimer(null);
         }
 
-        $caroler->getLoop()
+        $caroler->getEventLoop()
             ->addPeriodicTimer($this->heartbeatInterval / 1000, function (Timer $timer) use ($caroler) {
                 $caroler->setHeartbeatTimer($timer);
 
@@ -45,7 +45,7 @@ class Identify extends AbstractEventHandler implements EventHandlerInterface
         $caroler->getConnection()->send(json_encode([
             'op' => 2,
             'd' => [
-                'token' => $caroler->getToken(),
+                'token' => $caroler->getOption('token'),
                 'properties' => [
                     '$os' => 'Linux',
                     '$browser' => 'Caroler',
