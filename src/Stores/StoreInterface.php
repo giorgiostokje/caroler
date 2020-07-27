@@ -14,13 +14,13 @@ namespace Caroler\Stores;
 interface StoreInterface
 {
     /**
-     * Retrieves an item from the store.
+     * Retrieves one or all items from the store.
      *
-     * @param string $key
+     * @param string|null $key
      *
      * @return mixed
      */
-    public function get(string $key);
+    public function get(string $key = null);
 
     /**
      * Stores an item in the store.

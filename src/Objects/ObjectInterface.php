@@ -22,4 +22,6 @@ interface ObjectInterface
      * @return \Caroler\Objects\ObjectInterface
      */
     public function prepare(stdClass $data): ObjectInterface;
+
+    public function toArray(): array;
 }

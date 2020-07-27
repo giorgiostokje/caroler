@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Caroler\Objects;
 
+use Caroler\Traits\Arrayable;
 use Caroler\Traits\Populatable;
 use stdClass;
 
@@ -24,5 +25,10 @@ abstract class AbstractObject implements ObjectInterface
         $this->populate($data);
 
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [];
     }
 }

@@ -25,6 +25,16 @@ abstract class Command implements CommandInterface
     protected $description;
 
     /**
+     * @var string Command author
+     */
+    protected $author;
+
+    /**
+     * @var string Command version – SemVer is recommended!
+     */
+    protected $version;
+
+    /**
      * @var \Caroler\Objects\Message Message Object
      */
     protected $message;
@@ -40,6 +50,11 @@ abstract class Command implements CommandInterface
     public function getSignature(): string
     {
         return $this->signature;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
     }
 
     /**

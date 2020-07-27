@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Caroler;
 
+use Caroler\Commands\About;
+use Caroler\Commands\Help;
 use Caroler\Exceptions\TokenNotFoundException;
+use Caroler\Objects\Embed;
 use Caroler\OutputWriters\DiscordOutputWriter;
 use Caroler\OutputWriters\OutputWriterInterface;
 use Caroler\Stores\CommandStore;
@@ -58,14 +61,14 @@ class Caroler
     private $outputWriters = [];
 
     /**
-     * @var \Caroler\Stores\CommandStore Available bot commands
-     */
-    private $commandStore;
-
-    /**
      * @var \GuzzleHttp\Client Application HTTP client
      */
     private $httpClient;
+
+    /**
+     * @var \Caroler\Stores\CommandStore Available bot commands
+     */
+    private $commandStore;
 
     /**
      * @var \React\EventLoop\LoopInterface Application event loop
@@ -124,7 +127,10 @@ class Caroler
         ]);
 
         $this->commandStore = new CommandStore();
-        $this->registerCommands($this->getOption('commands'));
+        $this->registerCommands($this->getOption('commands'))->registerCommands([
+            Help::class,
+            About::class,
+        ]);
     }
 
     /**
@@ -163,6 +169,40 @@ class Caroler
         );
 
         $this->eventLoop->run();
+    }
+
+    /**
+     * Sends a message to a channel.
+     *
+     * @param string $message
+     * @param \Caroler\Objects\Message|string $context Message object or channel id
+     * @param \Caroler\Objects\Embed|null $embed
+     *
+     * @return $this
+     */
+    public function send(string $message, $context, Embed $embed = null): Caroler
+    {
+        if (!$context instanceof Message && !is_string($context)) {
+            throw new \InvalidArgumentException("Context must be either a Message object or a string!");
+        }
+
+        $channelId = $context instanceof Message ? $context->channelId : $context;
+        $data = ['json' => ['content' => $message]];
+        !isset($embed) ?: $data['json']['embed'] = $embed->toArray();
+
+        try {
+            $this->httpClient->post(
+                "channels/" . $channelId . "/messages",
+                $data
+            );
+        } catch (RequestException $e) {
+            $this->write("Failed to send message: " . Psr7\str($e->getRequest()));
+            if ($e->hasResponse()) {
+                $this->write("Discord responded with: " . Psr7\str($e->getResponse()));
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -240,57 +280,6 @@ class Caroler
     public function getSequence(): ?int
     {
         return $this->sequence;
-    }
-
-    /**
-     * @return \Caroler\State
-     */
-    public function getState(): State
-    {
-        return $this->state;
-    }
-
-    /**
-     * @param \Caroler\State $state
-     *
-     * @return \Caroler\Caroler
-     */
-    public function setState(State $state): Caroler
-    {
-        $this->state = $state;
-
-        return $this;
-    }
-
-    /**
-     * Sends a message to a channel.
-     *
-     * @param string $message
-     * @param \Caroler\Objects\Message|string $context Message object or channel id
-     *
-     * @return $this
-     */
-    public function send(string $message, $context): Caroler
-    {
-        if (!$context instanceof Message && !is_string($context)) {
-            throw new \InvalidArgumentException("Context must be either a Message object or a string!");
-        }
-
-        $channelId = $context instanceof Message ? $context->channelId : $context;
-
-        try {
-            $this->httpClient->post(
-                "channels/" . $channelId . "/messages",
-                ['json' => ['content' => $message]]
-            );
-        } catch (RequestException $e) {
-            $this->write("Failed to send message: " . Psr7\str($e->getRequest()));
-            if ($e->hasResponse()) {
-                $this->write("Discord responded with: " . Psr7\str($e->getResponse()));
-            }
-        }
-
-        return $this;
     }
 
     // =========================================================================
@@ -504,6 +493,16 @@ class Caroler
     }
 
     /**
+     * Retrieves all available commands.
+     *
+     * @return array
+     */
+    public function getCommands(): array
+    {
+        return $this->commandStore->get();
+    }
+
+    /**
      * Registers a bot command.
      *
      * @param string $class
@@ -512,7 +511,7 @@ class Caroler
      * @return \Caroler\Caroler
      * @api
      */
-    public function registerCommand(string $class, string $signature = null): Caroler
+    public function registerCommand(string $class, $signature = null): Caroler
     {
         try {
             /** @var \Caroler\Commands\CommandInterface $command */
@@ -524,7 +523,6 @@ class Caroler
         }
 
         $this->commandStore->set($signature, $class);
-        $this->write("Command \"$signature\" registered.", false, 'info');
 
         return $this;
     }
@@ -571,5 +569,29 @@ class Caroler
     public function commands(array $commands): Caroler
     {
         return $this->registerCommands($commands);
+    }
+
+    // =========================================================================
+    // State
+    // =========================================================================
+
+    /**
+     * @return \Caroler\State
+     */
+    public function getState(): State
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param \Caroler\State $state
+     *
+     * @return \Caroler\Caroler
+     */
+    public function setState(State $state): Caroler
+    {
+        $this->state = $state;
+
+        return $this;
     }
 }

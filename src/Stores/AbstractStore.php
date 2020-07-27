@@ -14,14 +14,14 @@ abstract class AbstractStore implements StoreInterface
     /**
      * @var array Items in the store
      */
-    protected $items;
+    protected $items = [];
 
     /**
      * @inheritDoc
      */
-    public function get(string $key)
+    public function get(string $key = null)
     {
-        return $this->items[$key] ?? null;
+        return is_null($key) ? $this->items : $this->items[$key] ?? null;
     }
 
     /**
