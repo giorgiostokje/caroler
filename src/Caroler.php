@@ -14,11 +14,8 @@ use Caroler\Stores\CommandStore;
 use Caroler\Stores\ConfigStore;
 use Exception;
 use Caroler\Factories\EventHandlerFactory;
-use Caroler\Objects\Message;
 use Caroler\OutputWriters\OutputWriterFactory;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\MessageInterface;
@@ -182,27 +179,7 @@ class Caroler
      */
     public function send(string $message, $context, Embed $embed = null): Caroler
     {
-        if (!$context instanceof Message && !is_string($context)) {
-            throw new \InvalidArgumentException("Context must be either a Message object or a string!");
-        }
-
-        $channelId = $context instanceof Message ? $context->channelId : $context;
-        $data = ['json' => ['content' => $message]];
-        !isset($embed) ?: $data['json']['embed'] = $embed->toArray();
-
-        try {
-            $this->httpClient->post(
-                "channels/" . $channelId . "/messages",
-                $data
-            );
-        } catch (RequestException $e) {
-            $this->write("Failed to send message: " . Psr7\str($e->getRequest()));
-            if ($e->hasResponse()) {
-                $this->write("Discord responded with: " . Psr7\str($e->getResponse()));
-            }
-        }
-
-        return $this;
+        // TODO: remove
     }
 
     /**
@@ -216,6 +193,14 @@ class Caroler
         $this->eventLoop->stop();
 
         return $this;
+    }
+
+    /**
+     * @return \GuzzleHttp\Client
+     */
+    public function getHttpClient(): Client
+    {
+        return $this->httpClient;
     }
 
     /**
@@ -456,7 +441,7 @@ class Caroler
     public function write($messages, bool $debug = false, string $type = null): Caroler
     {
         foreach ($this->outputWriters as $outputWriter) {
-            if (!$debug || ($this->getOption('debug') && $debug)) {
+            if (!$debug || ($this->getOption('debug'))) {
                 $outputWriter->write($messages, $type);
             }
         }

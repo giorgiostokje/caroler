@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Caroler\Commands;
 
 use Caroler\Objects\Embed;
+use Caroler\Resources\Channel;
 
 class Help extends Command
 {
@@ -34,7 +35,11 @@ class Help extends Command
             unset($command);
         }
 
-        $this->caroler->send("Test", $this->message, $embed);
+        $channel = new Channel();
+        $channel->prepare($this->message, $this->caroler)->createMessage([
+            'content' => "Test",
+            'embed' => $embed
+        ]);
 
         return true;
     }

@@ -7,21 +7,26 @@ namespace Caroler\Objects;
 use stdClass;
 
 /**
- * Common object interface
- * All Objects MUST implement this interface!
+ * Common (Discord) object interface
+ * All Objects must implement this interface!
  *
  * @package Caroler\Objects
  */
 interface ObjectInterface
 {
     /**
-     * Prepares the Object.
+     * Prepares the object.
      *
-     * @param \stdClass $data
+     * @param \stdClass|array $data
      *
      * @return \Caroler\Objects\ObjectInterface
      */
-    public function prepare(stdClass $data): ObjectInterface;
+    public function prepare($data): ObjectInterface;
 
+    /**
+     * Returns all non-null object properties as an array.
+     *
+     * @return array
+     **/
     public function toArray(): array;
 }

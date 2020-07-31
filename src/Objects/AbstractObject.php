@@ -9,26 +9,22 @@ use Caroler\Traits\Populatable;
 use stdClass;
 
 /**
- * Common Object functionality
+ * Common object functionality
  *
  * @package Caroler\Objects
  */
 abstract class AbstractObject implements ObjectInterface
 {
+    use Arrayable;
     use Populatable;
 
     /**
      * @inheritDoc
      */
-    public function prepare(stdClass $data): ObjectInterface
+    public function prepare($data): ObjectInterface
     {
         $this->populate($data);
 
         return $this;
-    }
-
-    public function toArray(): array
-    {
-        return [];
     }
 }

@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Caroler\Objects;
 
+use InvalidArgumentException;
+
 /**
  * Embed object class
  *
  * @package Caroler\Objects
+ * @see https://discord.com/developers/docs/resources/channel#embed-object
  */
 class Embed extends AbstractObject implements ObjectInterface
 {
     /**
      * @var string
      */
-    public const COLOR_RED = '#FF0000';
+    public const COLOR_BLUE = '#0000FF';
 
     /**
      * @var string
@@ -24,7 +27,17 @@ class Embed extends AbstractObject implements ObjectInterface
     /**
      * @var string
      */
-    public const COLOR_BLUE = '#0000FF';
+    public const COLOR_ORANGE = '#FFA500';
+
+    /**
+     * @var string
+     */
+    public const COLOR_PURPLE = '#800080';
+
+    /**
+     * @var string
+     */
+    public const COLOR_RED = '#FF0000';
 
     /**
      * @var string
@@ -32,70 +45,72 @@ class Embed extends AbstractObject implements ObjectInterface
     public const COLOR_YELLOW = '#FFFF00';
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $title;
+    protected $title;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $description;
+    protected $description;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $url;
+    protected $url;
 
     /**
-     * @var string ISO8601 timestamp
+     * @var string|null ISO8601 timestamp
      */
-    private $timestamp;
+    protected $timestamp;
 
     /**
-     * @var string Hexadecimal color code
+     * @var string|null Hexadecimal color code
      */
-    private $color;
+    protected $color;
 
     /**
-     * @var array
-     * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
+     * @var array|null
      */
-    private $footer;
+    protected $footer;
 
     /**
-     * @var array
-     * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+     * @var array|null
      */
-    private $image;
+    protected $image;
 
     /**
-     * @var array
-     * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
+     * @var array|null
      */
-    private $thumbnail;
+    protected $thumbnail;
 
     /**
-     * @var array
-     * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
+     * @var array|null
      */
-    private $video;
+    protected $video;
 
     /**
-     * @var array
-     * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
+     * @var array|null
      */
-    private $provider;
+    protected $provider;
 
     /**
-     * @var array
-     * @see https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
+     * @var array|null
      */
-    private $author;
+    protected $author;
 
     /**
-     * @var array
+     * @var array|null
      */
-    private $fields = [];
+    protected $fields = [];
+
+    /**
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
 
     /**
      * @param string $title
@@ -107,6 +122,14 @@ class Embed extends AbstractObject implements ObjectInterface
         $this->title = $title;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 
     /**
@@ -122,6 +145,14 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    /**
      * @param string $url
      *
      * @return \Caroler\Objects\Embed
@@ -131,6 +162,14 @@ class Embed extends AbstractObject implements ObjectInterface
         $this->url = $url;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTimestamp(): ?string
+    {
+        return $this->timestamp;
     }
 
     /**
@@ -146,6 +185,14 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    /**
      * @param string $color
      *
      * @return \Caroler\Objects\Embed
@@ -155,6 +202,14 @@ class Embed extends AbstractObject implements ObjectInterface
         $this->color = hexdec(ltrim($color, '#'));
 
         return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getFooter(): ?array
+    {
+        return $this->footer;
     }
 
     /**
@@ -173,10 +228,18 @@ class Embed extends AbstractObject implements ObjectInterface
             !isset($icon['icon_url']) ?: $this->footer['icon_url'] = $icon['icon_url'];
             !isset($icon['proxy_icon_url']) ?: $this->footer['proxy_icon_url'] = $icon['proxy_icon_url'];
         } else {
-            throw new \InvalidArgumentException("Invalid footer icon parameter provided!");
+            throw new InvalidArgumentException("Invalid footer icon parameter provided!");
         }
 
         return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getImage(): ?array
+    {
+        return $this->image;
     }
 
     /**
@@ -192,6 +255,14 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
+     * @return array|null
+     */
+    public function getThumbnail(): ?array
+    {
+        return $this->thumbnail;
+    }
+
+    /**
      * @param array $thumbnail
      *
      * @return \Caroler\Objects\Embed
@@ -201,6 +272,14 @@ class Embed extends AbstractObject implements ObjectInterface
         $this->thumbnail = $thumbnail;
 
         return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getVideo(): ?array
+    {
+        return $this->video;
     }
 
     /**
@@ -216,6 +295,14 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
+     * @return array|null
+     */
+    public function getProvider(): ?array
+    {
+        return $this->provider;
+    }
+
+    /**
      * @param array $provider
      *
      * @return \Caroler\Objects\Embed
@@ -228,6 +315,14 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
+     * @return array|null
+     */
+    public function getAuthor(): ?array
+    {
+        return $this->author;
+    }
+
+    /**
      * @param array $author
      *
      * @return \Caroler\Objects\Embed
@@ -235,6 +330,37 @@ class Embed extends AbstractObject implements ObjectInterface
     public function setAuthor(array $author): Embed
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getFields(): ?array
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param array[] $fields
+     *
+     * @return \Caroler\Objects\Embed
+     */
+    public function setFields(array $fields): Embed
+    {
+        foreach ($fields as $field) {
+            if (
+                isset($field['name'])
+                && is_string($field['name'])
+                && isset($field['value'])
+                && is_string($field['value'])
+            ) {
+                $this->addField($field['name'], $field['value'], $field['inline'] ?? false);
+            } else {
+                throw new InvalidArgumentException("Invalid embed field parameters provided!");
+            }
+        }
 
         return $this;
     }
@@ -255,39 +381,5 @@ class Embed extends AbstractObject implements ObjectInterface
         ];
 
         return $this;
-    }
-
-    /**
-     * @param array[] $fields
-     *
-     * @return \Caroler\Objects\Embed
-     */
-    public function addFields(array $fields): Embed
-    {
-        foreach ($fields as $field) {
-            if (
-                isset($field['name'])
-                && is_string($field['name'])
-                && isset($field['value'])
-                && is_string($field['value'])
-            ) {
-                $this->addField($field['name'], $field['value'], $field['inline'] ?? false);
-            } else {
-                throw new \InvalidArgumentException("Invalid embed field parameters provided!");
-            }
-        }
-
-        return $this;
-    }
-
-    public function toArray(): array
-    {
-        $array = [];
-        $properties = get_object_vars($this);
-        foreach ($properties as $key => $value) {
-            is_null($value) ?: $array[$key] = $value;
-        }
-
-        return $array;
     }
 }

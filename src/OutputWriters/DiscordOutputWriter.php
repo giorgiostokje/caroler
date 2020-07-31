@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Caroler\OutputWriters;
 
 use Caroler\Caroler;
+use Caroler\Resources\Channel;
 
 /**
  * DiscordOutputWriter class
@@ -40,8 +41,11 @@ class DiscordOutputWriter extends AbstractOutputWriter implements OutputWriterIn
     {
         $messages = $this->process($messages, $type);
 
+        $channel = new Channel();
+        $channel->prepare($this->channelId, $this->caroler);
+
         foreach ($messages as $message) {
-            $this->caroler->send($message, $this->channelId);
+            $channel->createMessage($message);
         }
 
         return $this;

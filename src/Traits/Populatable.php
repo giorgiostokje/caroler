@@ -14,14 +14,14 @@ use stdClass;
 trait Populatable
 {
     /**
-     * Iterates the given object sets the corresponding class property.
+     * Iterates the given object or array and sets the corresponding class property.
      *
      * Only existing class properties will be set. Underscores are removed and the next character will be changed to
      * uppercase. The classes making use of this method must have their property names written in camelCase.
      *
-     * @param \stdClass|null $data
+     * @param \stdClass|array|null $data
      */
-    public function populate(?stdClass $data): void
+    public function populate($data): void
     {
         if (isset($data)) {
             foreach ($data as $key => $val) {

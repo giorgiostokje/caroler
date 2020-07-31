@@ -43,24 +43,21 @@ class MessageCreate extends AbstractEventHandler implements EventHandlerInterfac
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {
-        if (
-            (isset($this->message->author->bot) && $this->message->author->bot)
-            || (isset($this->message->author->system) && $this->message->author->system)
-        ) {
+        if ($this->message->getAuthor()->isBot() || $this->message->getAuthor()->isSystem()) {
             return $this;
         }
 
         if (
             substr(
-                $this->message->content,
+                $this->message->getContent(),
                 0,
                 strlen($caroler->getOption('command_prefix'))
             ) === $caroler->getOption('command_prefix')
         ) {
             $signature = substr(
-                strtok($this->message->content, ' '),
+                strtok($this->message->getContent(), ' '),
                 strlen($caroler->getOption('command_prefix')),
-                strlen(strtok($this->message->content, ' ')) - strlen($caroler->getOption('command_prefix'))
+                strlen(strtok($this->message->getContent(), ' ')) - strlen($caroler->getOption('command_prefix'))
             );
         }
 

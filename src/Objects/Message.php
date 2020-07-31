@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Caroler\Objects;
 
+use stdClass;
+
 /**
- * Channel Object class
+ * Message object class
  *
  * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/channel#message-object
@@ -13,122 +15,327 @@ namespace Caroler\Objects;
 class Message extends AbstractObject implements ObjectInterface
 {
     /**
-     * @var string Message id
+     * @var string
      */
-    public $id;
+    protected $id;
 
     /**
-     * @var string Message channel id
+     * @var string
      */
-    public $channelId;
+    protected $channelId;
 
     /**
-     * @var string Message guild id
+     * @var string|null
      */
-    public $guildId;
+    protected $guildId;
 
     /**
-     * @var \Caroler\Objects\User Message author
+     * @var stdClass|\Caroler\Objects\User
      */
-    public $author;
+    protected $author;
 
     /**
-     * @var \Caroler\Objects\GuildMember Message author's member properties
+     * @var \Caroler\Objects\GuildMember|null Message author's member properties
      */
-    public $member;
+    protected $member;
 
     /**
-     * @var string Message contents
+     * @var string
      */
-    public $content;
+    protected $content;
 
     /**
-     * @var string Message sent timestamp
+     * @var string ISO8601 timestamp
      */
-    public $timestamp;
+    protected $timestamp;
 
     /**
-     * @var string|null Message edited timestamp
+     * @var string|null ISO8601 timestamp
      */
-    public $editedTimestamp;
+    protected $editedTimestamp;
 
     /**
-     * @var bool Whether message was TTS
+     * @var bool
      */
-    public $tts;
+    protected $tts;
 
     /**
-     * @var bool Whether message mentions everyone
+     * @var bool
      */
-    public $mentionEveryone;
+    protected $mentionEveryone;
 
     /**
-     * @var \Caroler\Objects\User[] Message user mentions
+     * @var \Caroler\Objects\User[]
      */
-    public $mentions;
+    protected $mentions;
 
     /**
-     * @var \Caroler\Objects\Role[] Message role mentions
+     * @var \Caroler\Objects\Role[]
      */
-    public $mentionRoles;
+    protected $mentionRoles;
 
     /**
-     * @var \Caroler\Objects\ChannelMention[] Message role mentions
+     * @var \Caroler\Objects\ChannelMention[]|null
      */
-    public $mentionChannels;
+    protected $mentionChannels;
 
     /**
-     * @var \Caroler\Objects\Attachment[] Message file attachments
+     * @var \Caroler\Objects\Attachment[]
      */
-    public $attachments;
+    protected $attachments;
 
     /**
-     * @var \Caroler\Objects\Embed[] Message embedded content
+     * @var \Caroler\Objects\Embed[]
      */
-    public $embeds;
+    protected $embeds;
 
     /**
-     * @var \Caroler\Objects\Reaction[] Message reactions
+     * @var \Caroler\Objects\Reaction[]|null
      */
-    public $reactions;
+    protected $reactions;
 
     /**
-     * @var int|string Used for validating a message was sent.
+     * @var int|string|null Used for validating if a message was sent.
      */
-    public $nonce;
+    protected $nonce;
 
     /**
-     * @var bool Whether message is pinned
+     * @var bool
      */
-    public $pinned;
+    protected $pinned;
 
     /**
-     * @var string Message webhook id
+     * @var string|null
      */
-    public $webhookId;
+    protected $webhookId;
 
     /**
-     * @var int Message type
+     * @var int
      */
-    public $type;
+    protected $type;
 
     /**
-     * @var \Caroler\Objects\MessageActivity
+     * @var \Caroler\Objects\MessageActivity|null
      */
-    public $activity;
+    protected $activity;
 
     /**
-     * @var \Caroler\Objects\MessageApplication
+     * @var \Caroler\Objects\MessageApplication|null
      */
-    public $application;
+    protected $application;
 
     /**
-     * @var \Caroler\Objects\MessageReference
+     * @var \Caroler\Objects\MessageReference|null
      */
-    public $messageReference;
+    protected $messageReference;
 
     /**
-     * @var int Message flags
+     * @var int|null
      */
-    public $flags;
+    protected $flags;
+
+    /**
+     * @inheritDoc
+     */
+    public function prepare($data): ObjectInterface
+    {
+        parent::prepare($data);
+
+        $author = new User();
+        $this->author = $author->prepare($this->author);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChannelId(): string
+    {
+        return $this->channelId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGuildId(): ?string
+    {
+        return $this->guildId;
+    }
+
+    /**
+     * @return \Caroler\Objects\User
+     */
+    public function getAuthor(): User
+    {
+        return $this->author;
+    }
+
+    /**
+     * @return \Caroler\Objects\GuildMember|null
+     */
+    public function getMember(): ?GuildMember
+    {
+        return $this->member;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimestamp(): string
+    {
+        return $this->timestamp;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEditedTimestamp(): ?string
+    {
+        return $this->editedTimestamp;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTts(): bool
+    {
+        return $this->tts;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMentionEveryone(): bool
+    {
+        return $this->mentionEveryone;
+    }
+
+    /**
+     * @return \Caroler\Objects\User[]
+     */
+    public function getMentions(): array
+    {
+        return $this->mentions;
+    }
+
+    /**
+     * @return \Caroler\Objects\Role[]
+     */
+    public function getMentionRoles(): array
+    {
+        return $this->mentionRoles;
+    }
+
+    /**
+     * @return \Caroler\Objects\ChannelMention[]|null
+     */
+    public function getMentionChannels(): ?array
+    {
+        return $this->mentionChannels;
+    }
+
+    /**
+     * @return \Caroler\Objects\Attachment[]
+     */
+    public function getAttachments(): array
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * @return \Caroler\Objects\Embed[]
+     */
+    public function getEmbeds(): array
+    {
+        return $this->embeds;
+    }
+
+    /**
+     * @return \Caroler\Objects\Reaction[]|null
+     */
+    public function getReactions(): ?array
+    {
+        return $this->reactions;
+    }
+
+    /**
+     * @return int|string|null
+     */
+    public function getNonce()
+    {
+        return $this->nonce;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPinned(): bool
+    {
+        return $this->pinned;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getWebhookId(): ?string
+    {
+        return $this->webhookId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return \Caroler\Objects\MessageActivity|null
+     */
+    public function getActivity(): ?MessageActivity
+    {
+        return $this->activity;
+    }
+
+    /**
+     * @return \Caroler\Objects\MessageApplication|null
+     */
+    public function getApplication(): ?MessageApplication
+    {
+        return $this->application;
+    }
+
+    /**
+     * @return \Caroler\Objects\MessageReference|null
+     */
+    public function getMessageReference(): ?MessageReference
+    {
+        return $this->messageReference;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getFlags(): ?int
+    {
+        return $this->flags;
+    }
 }
