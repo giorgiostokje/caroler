@@ -75,7 +75,7 @@ class Embed extends AbstractObject implements ObjectInterface
     protected $footer;
 
     /**
-     * @var array|null
+     * @var string|array|null
      */
     protected $image;
 
@@ -103,6 +103,11 @@ class Embed extends AbstractObject implements ObjectInterface
      * @var array|null
      */
     protected $fields = [];
+
+    public function __construct()
+    {
+        $this->setFooter("Powered by Caroler – https://carolerbot.com", "https://i.imgur.com/DAfvGyp.png");
+    }
 
     /**
      * @return string|null
@@ -214,22 +219,17 @@ class Embed extends AbstractObject implements ObjectInterface
 
     /**
      * @param string $text
-     * @param string|array $icon
+     * @param string|null $iconUrl
+     * @param string|null $proxyIconUrl
      *
      * @return \Caroler\Objects\Embed
      */
-    public function setFooter(string $text, $icon): Embed
+    public function setFooter(string $text, string $iconUrl = null, string $proxyIconUrl = null): Embed
     {
+        $this->footer = [];
         $this->footer['text'] = $text;
-
-        if (is_string($icon)) {
-            $this->footer['icon_url'] = $icon;
-        } elseif (is_array($icon)) {
-            !isset($icon['icon_url']) ?: $this->footer['icon_url'] = $icon['icon_url'];
-            !isset($icon['proxy_icon_url']) ?: $this->footer['proxy_icon_url'] = $icon['proxy_icon_url'];
-        } else {
-            throw new InvalidArgumentException("Invalid footer icon parameter provided!");
-        }
+        !isset($iconUrl) ?: $this->footer['icon_url'] = $iconUrl;
+        !isset($proxyIconUrl) ?: $this->footer['proxy_icon_url'] = $proxyIconUrl;
 
         return $this;
     }
@@ -243,13 +243,19 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
-     * @param array $image
+     * @param string $url
+     * @param int|null $height
+     * @param int|null $width
+     * @param string|null $proxyUrl
      *
      * @return \Caroler\Objects\Embed
      */
-    public function setImage(array $image): Embed
+    public function setImage(string $url, int $height = null, int $width = null, string $proxyUrl = null): Embed
     {
-        $this->image = $image;
+        $this->image['url'] = $url;
+        !isset($height) ?: $this->image['height'] = $height;
+        !isset($width) ?: $this->image['width'] = $width;
+        !isset($proxyUrl) ?: $this->image['proxy_url'] = $proxyUrl;
 
         return $this;
     }
@@ -263,13 +269,19 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
-     * @param array $thumbnail
+     * @param string $url
+     * @param int|null $height
+     * @param int|null $width
+     * @param string|null $proxyUrl
      *
      * @return \Caroler\Objects\Embed
      */
-    public function setThumbnail(array $thumbnail): Embed
+    public function setThumbnail(string $url, int $height = null, int $width = null, string $proxyUrl = null): Embed
     {
-        $this->thumbnail = $thumbnail;
+        $this->thumbnail['url'] = $url;
+        !isset($height) ?: $this->thumbnail['height'] = $height;
+        !isset($width) ?: $this->thumbnail['width'] = $width;
+        !isset($proxyUrl) ?: $this->thumbnail['proxy_url'] = $proxyUrl;
 
         return $this;
     }
@@ -283,13 +295,17 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
-     * @param array $video
+     * @param string $url
+     * @param int|null $height
+     * @param int|null $width
      *
      * @return \Caroler\Objects\Embed
      */
-    public function setVideo(array $video): Embed
+    public function setVideo(string $url, int $height = null, int $width = null): Embed
     {
-        $this->video = $video;
+        $this->video['url'] = $url;
+        !isset($height) ?: $this->video['height'] = $height;
+        !isset($width) ?: $this->video['width'] = $width;
 
         return $this;
     }
@@ -303,13 +319,15 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
-     * @param array $provider
+     * @param string $name
+     * @param string|null $url
      *
      * @return \Caroler\Objects\Embed
      */
-    public function setProvider(array $provider): Embed
+    public function setProvider(string $name, string $url = null): Embed
     {
-        $this->provider = $provider;
+        $this->provider['name'] = $name;
+        !isset($url) ?: $this->provider['url'] = $url;
 
         return $this;
     }
@@ -323,13 +341,23 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
-     * @param array $author
+     * @param string $name
+     * @param string|null $url
+     * @param string|null $iconUrl
+     * @param string|null $proxyIconUrl
      *
      * @return \Caroler\Objects\Embed
      */
-    public function setAuthor(array $author): Embed
-    {
-        $this->author = $author;
+    public function setAuthor(
+        string $name,
+        string $url = null,
+        string $iconUrl = null,
+        string $proxyIconUrl = null
+    ): Embed {
+        $this->author['name'] = $name;
+        !isset($url) ?: $this->author['url'] = $url;
+        !isset($iconUrl) ?: $this->author['icon_url'] = $iconUrl;
+        !isset($proxyIconUrl) ?: $this->author['proxy_icon_url'] = $proxyIconUrl;
 
         return $this;
     }

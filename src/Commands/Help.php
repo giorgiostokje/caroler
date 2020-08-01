@@ -24,21 +24,19 @@ class Help extends Command
      */
     public function handle(): bool
     {
-        $embed = new Embed();
-        $embed->setTitle("Available Commands")->setColor(Embed::COLOR_GREEN);
+        $this->embed->setTitle("Available Commands")->setColor(Embed::COLOR_BLUE);
         $commands = $this->caroler->getCommands();
         ksort($commands);
 
         foreach ($commands as $signature => $class) {
             $command = new $class();
-            $embed->addField($this->caroler->getOption('command_prefix') . $signature, $command->getDescription());
+            $this->embed->addField($this->caroler->getOption('command_prefix') . $signature, $command->getDescription());
             unset($command);
         }
 
-        $channel = new Channel();
-        $channel->prepare($this->message, $this->caroler)->createMessage([
-            'content' => "Test",
-            'embed' => $embed
+        $this->channel->prepare($this->message, $this->caroler)->createMessage([
+            'content' => "",
+            'embed' => $this->embed
         ]);
 
         return true;

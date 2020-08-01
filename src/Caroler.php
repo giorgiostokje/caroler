@@ -32,6 +32,11 @@ use React\Socket\Connector as ReactConnector;
 class Caroler
 {
     /**
+     * @var string Caroler version
+     */
+    public const APP_VERSION = '0.1.0-alpha';
+
+    /**
      * @var string Discord WebSocket Gateway URL
      */
     private const DISCORD_GATEWAY_URL = 'wss://gateway.discord.gg/';

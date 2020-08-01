@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Caroler\Commands;
 
+use Caroler\Caroler;
+use Caroler\Objects\Embed;
+use Caroler\Resources\Channel;
+
 /**
  * About command class
  *
@@ -26,13 +30,19 @@ class About extends Command
      */
     public function handle(): bool
     {
-        $this->caroler->send(
-            "Caroler – An extensible Discord bot written in PHP\n"
-            . "Developed by <@137568507096203264>\n"
-            . "Read the documentation at https://carolerbot.com\n"
-            . "Join the official Discord server at https://discord.gg/6m5sjTW",
-            $this->message
-        );
+        $this->channel->prepare($this->message, $this->caroler)->createMessage([
+            'content' => "",
+            'embed' => $this->embed->setTitle('Caroler')
+                ->setDescription('An extensible Discord bot written in PHP.')
+                ->setUrl('https://carolerbot.com')
+                ->setColor(Embed::COLOR_BLUE)
+                ->setImage('https://i.imgur.com/cV2Q60v.png', 256, 128)
+                ->setThumbnail('https://i.imgur.com/Bzs43J5.png')
+                ->addField('Website', 'https://carolerbot.com')
+                ->addField('Discord Server', 'https://discord.gg/6m5sjTW')
+                ->addField('Version', Caroler::APP_VERSION . "\nhttps://github.com/giorgiostokje/caroler/tree/develop")
+                ->addField('Developer', '<@137568507096203264>')
+        ]);
 
         return true;
     }

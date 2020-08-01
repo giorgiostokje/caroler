@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Caroler\Commands;
 
 use Caroler\Caroler;
+use Caroler\Objects\Embed;
 use Caroler\Objects\Message;
+use Caroler\Resources\Channel;
 
 /**
  * Common Command functionality
@@ -45,17 +47,14 @@ abstract class Command implements CommandInterface
     protected $caroler;
 
     /**
-     * @return string
+     * @var \Caroler\Resources\Channel Discord Channel REST API resource
      */
-    public function getSignature(): string
-    {
-        return $this->signature;
-    }
+    protected $channel;
 
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
+    /**
+     * @var \Caroler\Objects\Embed Discord Rich Embed
+     */
+    protected $embed;
 
     /**
      * @inheritDoc
@@ -64,7 +63,25 @@ abstract class Command implements CommandInterface
     {
         $this->message = $message;
         $this->caroler = $caroler;
+        $this->channel = new Channel();
+        $this->embed = new Embed();
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignature(): string
+    {
+        return $this->signature;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
     }
 }
