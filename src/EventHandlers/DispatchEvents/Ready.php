@@ -9,20 +9,44 @@ use Caroler\EventHandlers\AbstractEventHandler;
 use Caroler\EventHandlers\EventHandlerInterface;
 use Caroler\Objects\User;
 use Caroler\State;
+use stdClass;
 
 /**
- * Ready Event handler class
+ * Ready Dispatch Event Handler class
  *
  * @package Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#ready
  */
 class Ready extends AbstractEventHandler implements EventHandlerInterface
 {
+    /**
+     * @var int Gateway version
+     */
     protected $v;
+
+    /**
+     * @var stdClass|\Caroler\Objects\User
+     */
     protected $user;
+
+    /**
+     * @var array Empty array
+     */
     protected $privateChannels;
+
+    /**
+     * @var array
+     */
     protected $guilds;
+
+    /**
+     * @var string Used for resuming connections
+     */
     protected $sessionId;
+
+    /**
+     * @var int[]|null Session shard information
+     */
     protected $shard;
 
     /**

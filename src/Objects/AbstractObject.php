@@ -6,10 +6,9 @@ namespace Caroler\Objects;
 
 use Caroler\Traits\Arrayable;
 use Caroler\Traits\Populatable;
-use stdClass;
 
 /**
- * Common object functionality
+ * Common (Discord) Object functionality
  *
  * @package Caroler\Objects
  */

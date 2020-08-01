@@ -28,6 +28,8 @@ class SymfonyConsoleOutputWriterAdapter extends AbstractOutputWriter implements 
 
     /**
      * @inheritDoc
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function write($messages, string $type = null): OutputWriterInterface
     {
@@ -42,7 +44,7 @@ class SymfonyConsoleOutputWriterAdapter extends AbstractOutputWriter implements 
      * Formats messages by prefixing a timestamp and applying styling.
      *
      * @param string|string[] $messages
-     * @param string $type
+     * @param string|null $type
      *
      * @return string|string[]
      */

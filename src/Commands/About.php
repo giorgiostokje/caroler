@@ -6,7 +6,6 @@ namespace Caroler\Commands;
 
 use Caroler\Caroler;
 use Caroler\Objects\Embed;
-use Caroler\Resources\Channel;
 
 /**
  * About command class
@@ -27,6 +26,7 @@ class About extends Command
 
     /**
      * @inheritDoc
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function handle(): bool
     {

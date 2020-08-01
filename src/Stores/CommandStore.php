@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Caroler\Stores;
 
 /**
- * CommandStore class
+ * Command Store class
  *
  * @package Caroler\Commands
  */

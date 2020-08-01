@@ -6,15 +6,15 @@ namespace Caroler;
 
 use Caroler\Commands\About;
 use Caroler\Commands\Help;
+use Caroler\Exceptions\InvalidArgumentException;
 use Caroler\Exceptions\TokenNotFoundException;
-use Caroler\Objects\Embed;
+use Caroler\EventHandlers\EventHandlerFactory;
 use Caroler\OutputWriters\DiscordOutputWriter;
+use Caroler\OutputWriters\OutputWriterFactory;
 use Caroler\OutputWriters\OutputWriterInterface;
 use Caroler\Stores\CommandStore;
 use Caroler\Stores\ConfigStore;
 use Exception;
-use Caroler\Factories\EventHandlerFactory;
-use Caroler\OutputWriters\OutputWriterFactory;
 use GuzzleHttp\Client;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
@@ -32,7 +32,7 @@ use React\Socket\Connector as ReactConnector;
 class Caroler
 {
     /**
-     * @var string Caroler version
+     * @var string Caroler application version
      */
     public const APP_VERSION = '0.1.0-alpha';
 
@@ -106,6 +106,7 @@ class Caroler
      * @param array $options
      *
      * @throws \Caroler\Exceptions\TokenNotFoundException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function __construct(array $options = [])
     {
@@ -139,6 +140,8 @@ class Caroler
      * Initializes the connection and listens for events from the Discord Gateway.
      *
      * @return void
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      * @see https://discord.com/developers/docs/topics/opcodes-and-status-codes
      */
@@ -171,20 +174,6 @@ class Caroler
         );
 
         $this->eventLoop->run();
-    }
-
-    /**
-     * Sends a message to a channel.
-     *
-     * @param string $message
-     * @param \Caroler\Objects\Message|string $context Message object or channel id
-     * @param \Caroler\Objects\Embed|null $embed
-     *
-     * @return $this
-     */
-    public function send(string $message, $context, Embed $embed = null): Caroler
-    {
-        // TODO: remove
     }
 
     /**
@@ -381,6 +370,8 @@ class Caroler
      * @param string|OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\Caroler
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function setOutputWriter($outputWriter): Caroler
@@ -396,6 +387,8 @@ class Caroler
      * @param array[] $outputWriters
      *
      * @return \Caroler\Caroler
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function setOutputWriters(array $outputWriters): Caroler
     {
@@ -413,6 +406,8 @@ class Caroler
      * @param string|OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\Caroler
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function outputWriter($outputWriter): Caroler
@@ -426,6 +421,8 @@ class Caroler
      * @param array[] $outputWriters
      *
      * @return \Caroler\Caroler
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function outputWriters(array $outputWriters): Caroler
@@ -499,6 +496,8 @@ class Caroler
      * @param string|null $signature
      *
      * @return \Caroler\Caroler
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function registerCommand(string $class, $signature = null): Caroler
@@ -509,7 +508,7 @@ class Caroler
             $signature = !is_null($signature) && is_string($signature) ? $signature : $command->getSignature();
             unset($command);
         } catch (Exception $e) {
-            throw new \InvalidArgumentException("Invalid command class \"$class\"!");
+            throw new InvalidArgumentException("Invalid command class \"$class\"!");
         }
 
         $this->commandStore->set($signature, $class);
@@ -523,6 +522,8 @@ class Caroler
      * @param array $commands As [<'signature' => >'command_class', ...]
      *
      * @return \Caroler\Caroler
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function registerCommands(array $commands): Caroler
@@ -541,6 +542,8 @@ class Caroler
      * @param string|null $signature
      *
      * @return \Caroler\Caroler
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function command(string $class, string $signature = null): Caroler
@@ -554,6 +557,8 @@ class Caroler
      * @param array $commands As [<'signature' => >'command_class', ...]
      *
      * @return \Caroler\Caroler
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function commands(array $commands): Caroler

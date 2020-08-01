@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Caroler\Commands;
 
 use Caroler\Objects\Embed;
-use Caroler\Resources\Channel;
 
 class Help extends Command
 {
@@ -21,6 +20,7 @@ class Help extends Command
 
     /**
      * @inheritDoc
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function handle(): bool
     {
@@ -30,7 +30,10 @@ class Help extends Command
 
         foreach ($commands as $signature => $class) {
             $command = new $class();
-            $this->embed->addField($this->caroler->getOption('command_prefix') . $signature, $command->getDescription());
+            $this->embed->addField(
+                $this->caroler->getOption('command_prefix') . $signature,
+                $command->getDescription()
+            );
             unset($command);
         }
 

@@ -7,7 +7,7 @@ namespace Caroler\Objects;
 use stdClass;
 
 /**
- * Message object class
+ * Message Object class
  *
  * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/channel#message-object

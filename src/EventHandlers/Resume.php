@@ -7,7 +7,7 @@ namespace Caroler\EventHandlers;
 use Caroler\Caroler;
 
 /**
- * Resume Event handler class
+ * Resume Event Handler class
  *
  * @package Caroler\EventHandlers
  */
@@ -15,6 +15,7 @@ class Resume extends AbstractEventHandler implements EventHandlerInterface
 {
     /**
      * @inheritDoc
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {

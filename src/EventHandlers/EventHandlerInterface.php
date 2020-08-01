@@ -8,9 +8,9 @@ use Caroler\Caroler;
 use stdClass;
 
 /**
- * Common Event interface
+ * Common Event Handler interface
  *
- * All EventHandlers MUST implement this interface!
+ * All Event Handlers must implement this interface!
  *
  * @package Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#commands-and-events
@@ -18,7 +18,7 @@ use stdClass;
 interface EventHandlerInterface
 {
     /**
-     * Prepares the Event.
+     * Prepares the Event Handler.
      *
      * @param \stdClass|null $data
      *
@@ -27,7 +27,7 @@ interface EventHandlerInterface
     public function prepare(?stdClass $data): EventHandlerInterface;
 
     /**
-     * Executes the Event's logic.
+     * Executes the Event Handler's logic.
      *
      * @param \Caroler\Caroler $caroler
      *

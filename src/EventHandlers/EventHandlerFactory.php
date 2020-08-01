@@ -2,27 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Caroler\Factories;
+namespace Caroler\EventHandlers;
 
 use Caroler\EventHandlers\DispatchEvents\MessageCreate;
 use Caroler\EventHandlers\DispatchEvents\Ready;
-use Caroler\EventHandlers\EventHandlerInterface;
-use Caroler\EventHandlers\Heartbeat;
-use Caroler\EventHandlers\HeartbeatAck;
-use Caroler\EventHandlers\Identify;
-use Caroler\EventHandlers\NullEventHandler;
-use Caroler\EventHandlers\Reconnect;
 use stdClass;
 
 /**
- * Event factory class
+ * Event Handler factory class
  *
- * @package Caroler\Events
+ * @package Caroler\EventHandlers
  */
 class EventHandlerFactory
 {
     /**
-     * Creates and prepares an Event based on the given payload.
+     * Creates and prepares an Event Handler based on the given payload.
      *
      * @param \stdClass $payload
      *

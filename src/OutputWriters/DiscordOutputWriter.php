@@ -8,7 +8,7 @@ use Caroler\Caroler;
 use Caroler\Resources\Channel;
 
 /**
- * DiscordOutputWriter class
+ * Discord Output Writer class
  *
  * @package Caroler\OutputWriters
  */
@@ -36,6 +36,8 @@ class DiscordOutputWriter extends AbstractOutputWriter implements OutputWriterIn
 
     /**
      * @inheritDoc
+     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function write($messages, string $type = null): OutputWriterInterface
     {

@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace Caroler\Traits;
 
+use ReflectionClass;
+
+/**
+ * Helper for classes that need their (private) properties retrieved as an array.
+ *
+ * @package Caroler\Traits
+ */
 trait Arrayable
 {
     /**
@@ -14,7 +21,7 @@ trait Arrayable
      */
     public function toArray(): array
     {
-        $reflection = new \ReflectionClass(get_called_class());
+        $reflection = new ReflectionClass(get_called_class());
         $properties = $reflection->getProperties();
         $array = [];
         foreach ($properties as $property) {

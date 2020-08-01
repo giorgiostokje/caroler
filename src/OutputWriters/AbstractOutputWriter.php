@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Caroler\OutputWriters;
 
+use Caroler\Exceptions\InvalidArgumentException;
+
 /**
- * Common OutputWriter functionality
+ * Common Output Writer functionality
  *
  * @package Caroler\OutputWriters
  */
@@ -17,17 +19,18 @@ abstract class AbstractOutputWriter implements OutputWriterInterface
      * @param string|string[] $messages
      *
      * @return \Caroler\OutputWriters\OutputWriterInterface
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     protected function validateMessages($messages): OutputWriterInterface
     {
         if (!is_string($messages) && !is_array($messages)) {
-            throw new \InvalidArgumentException("Message must be a string or an array!");
+            throw new InvalidArgumentException("Message must be a string or an array!");
         }
 
         if (is_array($messages)) {
             foreach ($messages as $message) {
                 if (!is_string($message)) {
-                    throw new \InvalidArgumentException("Array of messages must contain only strings!");
+                    throw new InvalidArgumentException("Array of messages must contain only strings!");
                 }
             }
         }
@@ -41,11 +44,12 @@ abstract class AbstractOutputWriter implements OutputWriterInterface
      * @param string|null $type
      *
      * @return \Caroler\OutputWriters\OutputWriterInterface
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     protected function validateMessageType(?string $type): OutputWriterInterface
     {
         if (!is_null($type) && !in_array($type, ['info', 'comment', 'question', 'error'])) {
-            throw new \InvalidArgumentException("Invalid message type provided!");
+            throw new InvalidArgumentException("Invalid message type provided!");
         }
 
         return $this;
@@ -74,6 +78,7 @@ abstract class AbstractOutputWriter implements OutputWriterInterface
      * @param string|null $type
      *
      * @return array
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     protected function process($messages, ?string $type): array
     {

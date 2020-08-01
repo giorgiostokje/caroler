@@ -8,7 +8,7 @@ use Caroler\Traits\Populatable;
 use stdClass;
 
 /**
- * Common Event functionality
+ * Common Event Handler functionality
  *
  * @package Caroler\EventHandlers
  */

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Caroler\Objects;
 
-use InvalidArgumentException;
+use Caroler\Exceptions\InvalidArgumentException;
 
 /**
- * Embed object class
+ * Embed Object class
  *
  * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/channel#embed-object
@@ -104,6 +104,12 @@ class Embed extends AbstractObject implements ObjectInterface
      */
     protected $fields = [];
 
+    /**
+     * Sets a default Embed footer.
+     *
+     * If you do not have any content to place in the footer, please leave this
+     * footer intact for the sake of advertising!
+     */
     public function __construct()
     {
         $this->setFooter("Powered by Caroler – https://carolerbot.com", "https://i.imgur.com/DAfvGyp.png");
@@ -374,6 +380,7 @@ class Embed extends AbstractObject implements ObjectInterface
      * @param array[] $fields
      *
      * @return \Caroler\Objects\Embed
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function setFields(array $fields): Embed
     {
@@ -394,6 +401,8 @@ class Embed extends AbstractObject implements ObjectInterface
     }
 
     /**
+     * Add a single field to the current collection of fields.
+     *
      * @param string $name
      * @param string $value
      * @param bool $inline

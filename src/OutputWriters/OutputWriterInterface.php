@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Caroler\OutputWriters;
 
 /**
- * Common OutputWriter interface
+ * Common Output Writer interface
  *
- * All OutputWriter classes must implement this interface!
+ * All Output Writer classes must implement this interface!
  *
  * @package Caroler\OutputWriters
  */
@@ -17,7 +17,7 @@ interface OutputWriterInterface
      * Writes one or more messages to the output writer.
      *
      * @param string|string[] $messages
-     * @param string $type info|comment|question|error
+     * @param string|null $type info|comment|question|error
      *
      * @return \Caroler\OutputWriters\OutputWriterInterface
      */

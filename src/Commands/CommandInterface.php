@@ -10,6 +10,8 @@ use Caroler\Objects\Message;
 /**
  * Common Command interface
  *
+ * All Commands must implement this interface!
+ *
  * @package Caroler\Commands
  */
 interface CommandInterface

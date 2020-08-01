@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Caroler\OutputWriters;
 
 /**
- * ConsoleOutputWriter class
+ * Console Output Writer class
  *
  * @package Caroler\OutputWriters
  */
@@ -13,6 +13,7 @@ class ConsoleOutputWriter extends AbstractOutputWriter implements OutputWriterIn
 {
     /**
      * @inheritDoc
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function write($messages, string $type = null): OutputWriterInterface
     {

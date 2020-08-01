@@ -9,7 +9,7 @@ use Caroler\Objects\User;
 /**
  * Represents the current state of the application.
  *
- * The state is populated from the received Ready event, after the initial handshake with the Gateway.
+ * The state is populated from the received Ready Gateway event, after the initial handshake with the Gateway.
  *
  * @package Caroler
  * @see https://discord.com/developers/docs/topics/gateway#ready

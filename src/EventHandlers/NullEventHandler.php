@@ -8,7 +8,7 @@ use Caroler\Caroler;
 use stdClass;
 
 /**
- * Unimplemented Event handler class
+ * Unimplemented Event Handler class
  *
  * @package Caroler\EventHandlers
  */

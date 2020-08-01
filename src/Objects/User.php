@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Caroler\Objects;
 
 /**
- * User object class
+ * User Object class
  *
  * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/user#user-object

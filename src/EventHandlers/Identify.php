@@ -8,7 +8,7 @@ use Caroler\Caroler;
 use React\EventLoop\Timer\Timer;
 
 /**
- * Identify Event class
+ * Identify Event Handler class
  *
  * @package Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#identify

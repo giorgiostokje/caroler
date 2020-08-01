@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Caroler\Stores;
 
 /**
- * ConfigStore class
+ * Configuration Store class
  *
  * @package Caroler\Stores
  */

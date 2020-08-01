@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Caroler\Objects;
 
-use stdClass;
-
 /**
- * Common (Discord) object interface
+ * Common (Discord) Object interface
+ *
  * All Objects must implement this interface!
  *
  * @package Caroler\Objects

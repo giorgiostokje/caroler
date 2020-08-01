@@ -7,7 +7,7 @@ namespace Caroler\EventHandlers;
 use Caroler\Caroler;
 
 /**
- * Heartbeat Event (handler) class
+ * Heartbeat Event Handler class
  *
  * @package Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#heartbeat
@@ -16,6 +16,7 @@ class Heartbeat extends AbstractEventHandler implements EventHandlerInterface
 {
     /**
      * @inheritDoc
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {

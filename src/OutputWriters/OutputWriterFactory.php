@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Caroler\OutputWriters;
 
+use Caroler\Exceptions\InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * OutputWriterFactory class
+ * Output Writer factory class
  *
  * @package Caroler\OutputWriters
  */
@@ -16,9 +17,10 @@ class OutputWriterFactory
     /**
      * Returns an OutputWriter object, based on the provided parameter.
      *
-     * @param string|\Caroler\OutputWriters\OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
+     * @param string|OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\OutputWriters\OutputWriterInterface
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public static function make($outputWriter): OutputWriterInterface
     {
@@ -32,7 +34,7 @@ class OutputWriterFactory
             case 'console':
                 return new ConsoleOutputWriter();
             default:
-                throw new \InvalidArgumentException("Invalid output writer provided!");
+                throw new InvalidArgumentException("Invalid output writer provided!");
         }
     }
 }

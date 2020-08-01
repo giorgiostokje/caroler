@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Caroler\Commands\Dice;
+
 return [
 
     // =========================================================================
@@ -13,7 +15,7 @@ return [
     'token' => env('CAROLER_TOKEN'),
 
     // =========================================================================
-    // One or more characters used as prefix for your bot's commands. It is
+    // One or more characters used as prefix for your bot commands. It is
     // recommended to use one or more special characters that aren't already in
     // use by another bot in your server.
     // -------------------------------------------------------------------------
@@ -32,7 +34,7 @@ return [
     // Default: []
     // =========================================================================
     'commands' => [
-        'dice' => \App\Caroler\Commands\Dice::class,
+        'dice' => Dice::class,
     ],
 
     // =========================================================================

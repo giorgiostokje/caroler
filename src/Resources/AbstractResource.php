@@ -9,10 +9,15 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7;
 use stdClass;
 
+/**
+ * Common Resource functionality
+ *
+ * @package Caroler\Resources
+ */
 abstract class AbstractResource implements ResourceInterface
 {
     /**
-     * @var string|\Caroler\Objects\Message
+     * @var string|\Caroler\Objects\Message Context with which the Resource is approached
      */
     protected $context;
 
@@ -32,7 +37,16 @@ abstract class AbstractResource implements ResourceInterface
         return $this;
     }
 
-    private function makeHttpRequest(string $method, string $apiEndpoint, array $data): stdClass
+    /**
+     * Makes a HTTP request against the Discord REST API.
+     *
+     * @param string $method
+     * @param string $apiEndpoint
+     * @param array $data
+     *
+     * @return \stdClass|null
+     */
+    private function makeHttpRequest(string $method, string $apiEndpoint, array $data): ?stdClass
     {
         try {
             return json_decode((string) $this->caroler->getHttpClient()->$method(
@@ -45,15 +59,33 @@ abstract class AbstractResource implements ResourceInterface
                 $this->caroler->write("Discord responded with: " . Psr7\str($e->getResponse()));
             }
         }
+
+        return null;
     }
 
-    protected function post(string $apiEndpoint, array $data): stdClass
-    {
-        return $this->makeHttpRequest('post', $apiEndpoint, $data);
-    }
-
-    protected function get(string $apiEndpoint, array $data): stdClass
+    /**
+     * Makes a HTTP GET request against the Discord REST API.
+     *
+     * @param string $apiEndpoint
+     * @param array $data
+     *
+     * @return \stdClass|null
+     */
+    protected function get(string $apiEndpoint, array $data): ?stdClass
     {
         return $this->makeHttpRequest('get', $apiEndpoint, $data);
+    }
+
+    /**
+     * Makes a HTTP POST request against the Discord REST API.
+     *
+     * @param string $apiEndpoint
+     * @param array $data
+     *
+     * @return \stdClass|null
+     */
+    protected function post(string $apiEndpoint, array $data): ?stdClass
+    {
+        return $this->makeHttpRequest('post', $apiEndpoint, $data);
     }
 }
