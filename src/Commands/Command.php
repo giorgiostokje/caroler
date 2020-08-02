@@ -37,6 +37,11 @@ abstract class Command implements CommandInterface
     protected $version;
 
     /**
+     * @var bool Whether or not this command requires admin privileges.
+     */
+    protected $admin = false;
+
+    /**
      * @var \Caroler\Objects\Message Message Object
      */
     protected $message;
@@ -83,5 +88,13 @@ abstract class Command implements CommandInterface
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    /**
+     * @return bool
+     */
+    public function requiresAdmin(): bool
+    {
+        return $this->admin;
     }
 }

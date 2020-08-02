@@ -17,13 +17,6 @@ use Caroler\Objects\Message;
 interface CommandInterface
 {
     /**
-     * Returns the Command signature.
-     *
-     * @return string
-     */
-    public function getSignature(): string;
-
-    /**
      * Prepares the command before execution.
      *
      * @param \Caroler\Objects\Message $message
@@ -39,4 +32,24 @@ interface CommandInterface
      * @return bool
      */
     public function handle(): bool;
+
+    /**
+     * Returns the Command signature.
+     *
+     * @return string
+     */
+    public function getSignature(): string;
+
+    /**
+     * Returns the Command description.
+     * @return string
+     */
+    public function getDescription(): string;
+
+    /**
+     * Returns whether or not the Commands requires administrative privileges.
+     *
+     * @return bool
+     */
+    public function requiresAdmin(): bool;
 }

@@ -65,6 +65,13 @@ class MessageCreate extends AbstractEventHandler implements EventHandlerInterfac
             $command = $caroler->getCommand($signature);
             /** @var \Caroler\Commands\CommandInterface $command */
             $command = new $command();
+        }
+
+        if (
+            isset($command)
+            && (($command->requiresAdmin() && $this->message->getAuthor()->getId() === $caroler->getOption('admin_id'))
+                || !$command->requiresAdmin())
+        ) {
             $command->prepare($this->message, $caroler)->handle();
         }
 
