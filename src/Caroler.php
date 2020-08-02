@@ -14,6 +14,7 @@ use Caroler\OutputWriters\OutputWriterFactory;
 use Caroler\OutputWriters\OutputWriterInterface;
 use Caroler\Stores\CommandStore;
 use Caroler\Stores\ConfigStore;
+use Caroler\Stores\RateLimitBucketStore;
 use Exception;
 use GuzzleHttp\Client;
 use Ratchet\Client\Connector;
@@ -66,6 +67,11 @@ class Caroler
      * @var \GuzzleHttp\Client Application HTTP client
      */
     private $httpClient;
+
+    /**
+     * @var \Caroler\Stores\RateLimitBucketStore
+     */
+    private $rateLimitBucketStore;
 
     /**
      * @var \Caroler\Stores\CommandStore Available bot commands
@@ -128,6 +134,8 @@ class Caroler
                 'Authorization' => 'Bot ' . $this->getOption('token')
             ]
         ]);
+
+        $this->rateLimitBucketStore = new RateLimitBucketStore();
 
         $this->commandStore = new CommandStore();
         $this->registerCommands($this->getOption('commands'))->registerCommands([
@@ -300,7 +308,7 @@ class Caroler
      */
     public function configureOption(string $option, $value): Caroler
     {
-        $this->configStore->set($option, $value);
+        $this->configStore->put($option, $value);
 
         return $this;
     }
@@ -452,6 +460,72 @@ class Caroler
     }
 
     // =========================================================================
+    // Rate Limit Bucket
+    // =========================================================================
+
+    /**
+     * Determines whether or not a Rate Limit Bucket exists.
+     *
+     * @param string $bucket
+     *
+     * @return bool
+     */
+    public function rateLimitBucketExists(string $bucket): bool
+    {
+        return $this->rateLimitBucketStore->exists($bucket);
+    }
+
+    /**
+     * Retrieves a Rate Limit Bucket by one of its included endpoints.
+     *
+     * @param string $route
+     *
+     * @return array|null
+     */
+    public function getRateLimitBucketByRoute(string $route): ?array
+    {
+        $buckets = $this->rateLimitBucketStore->get();
+        foreach ($buckets as $bucket) {
+            foreach ($bucket['endpoints'] as $bucketEndpoint) {
+                if ($route === $bucketEndpoint) {
+                    return $bucket;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Stores or updates a Rate Limit Bucket.
+     *
+     * @param string $bucket
+     * @param string $endpoint
+     * @param int|null $remaining
+     * @param int|null $reset
+     *
+     * @return \Caroler\Caroler
+     */
+    public function updateRateLimitBucket(string $bucket, string $endpoint, ?int $remaining, ?int $reset): Caroler
+    {
+        $rateLimitBucket = [];
+
+        if ($this->rateLimitBucketStore->exists($bucket)) {
+            $rateLimitBucket = $this->rateLimitBucketStore->get($bucket);
+            !isset($rateLimitBucket['endpoints'][$endpoint]) ?: $rateLimitBucket['endpoints'][] = $endpoint;
+        } else {
+            $rateLimitBucket['endpoints'] = [$endpoint];
+        }
+
+        $rateLimitBucket['remaining'] = $remaining;
+        $rateLimitBucket['reset'] = $reset;
+
+        $this->rateLimitBucketStore->put($bucket, $rateLimitBucket);
+
+        return $this;
+    }
+
+    // =========================================================================
     // Commands
     // =========================================================================
 
@@ -511,7 +585,7 @@ class Caroler
             throw new InvalidArgumentException("Invalid command class \"$class\"!");
         }
 
-        $this->commandStore->set($signature, $class);
+        $this->commandStore->put($signature, $class);
 
         return $this;
     }

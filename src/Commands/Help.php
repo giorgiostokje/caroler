@@ -24,7 +24,7 @@ class Help extends Command
      */
     public function handle(): bool
     {
-        $this->embed->setTitle("Available Commands")->setColor(Embed::COLOR_BLUE);
+        $this->embed->setTitle("Available Commands")->setColor(Embed::COLOR_DISCORD);
         $commands = $this->caroler->getCommands();
         ksort($commands);
 

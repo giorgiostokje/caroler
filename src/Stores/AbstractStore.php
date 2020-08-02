@@ -27,7 +27,7 @@ abstract class AbstractStore implements StoreInterface
     /**
      * @inheritDoc
      */
-    public function set(string $key, $item): StoreInterface
+    public function put(string $key, $item): StoreInterface
     {
         $this->items[$key] = $item;
 

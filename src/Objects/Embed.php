@@ -45,6 +45,11 @@ class Embed extends AbstractObject implements ObjectInterface
     public const COLOR_YELLOW = '#FFFF00';
 
     /**
+     * @var string
+     */
+    public const COLOR_DISCORD = '#7289DA';
+
+    /**
      * @var string|null
      */
     protected $title;
@@ -112,7 +117,7 @@ class Embed extends AbstractObject implements ObjectInterface
      */
     public function __construct()
     {
-        $this->setFooter("Powered by Caroler – https://carolerbot.com", "https://i.imgur.com/DAfvGyp.png");
+        $this->setFooter("Powered by Caroler – https://carolerbot.com", "https://i.imgur.com/DBzTrQu.png");
     }
 
     /**

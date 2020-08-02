@@ -30,7 +30,7 @@ interface StoreInterface
      *
      * @return \Caroler\Stores\StoreInterface
      */
-    public function set(string $key, $item): StoreInterface;
+    public function put(string $key, $item): StoreInterface;
 
     /**
      * Determines whether or not an item exists in the Store.

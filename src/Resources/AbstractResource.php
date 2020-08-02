@@ -43,21 +43,51 @@ abstract class AbstractResource implements ResourceInterface
      * @param string $method
      * @param string $apiEndpoint
      * @param array $data
+     * @param int $delay
      *
      * @return \stdClass|null
      */
-    private function makeHttpRequest(string $method, string $apiEndpoint, array $data): ?stdClass
+    private function makeHttpRequest(string $method, string $apiEndpoint, array $data, int $delay = 0): ?stdClass
     {
+        sleep($delay);
+
+        $route = static::API_RESOURCE . $apiEndpoint;
+        $rateLimitBucket = $this->caroler->getRateLimitBucketByRoute($route);
+        if (
+            !is_null($rateLimitBucket)
+            && $rateLimitBucket['remaining'] === 0
+            && time() < $rateLimitBucket['reset']
+        ) {
+            return $this->makeHttpRequest($method, $apiEndpoint, $data, $rateLimitBucket['reset'] - time());
+        }
+
         try {
-            return json_decode((string) $this->caroler->getHttpClient()->$method(
-                static::API_RESOURCE . $apiEndpoint,
+            $response = $this->caroler->getHttpClient()->$method(
+                $route,
                 ['json' => $data]
-            )->getBody());
-        } catch (RequestException $e) {
-            $this->caroler->write("Failed to send message: " . Psr7\str($e->getRequest()));
-            if ($e->hasResponse()) {
-                $this->caroler->write("Discord responded with: " . Psr7\str($e->getResponse()));
+            );
+
+            if ($response->hasHeader('X-RateLimit-Bucket')) {
+                $this->caroler->updateRateLimitBucket(
+                    $response->getHeader('X-RateLimit-Bucket')[0],
+                    $route,
+                    (int) $response->getHeader('X-RateLimit-Remaining')[0] ?? null,
+                    (int) $response->getHeader('X-RateLimit-Reset')[0] ?? null
+                );
             }
+
+            return json_decode((string) $response->getBody());
+        } catch (RequestException $e) {
+            if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 429) {
+                $this->makeHttpRequest(
+                    $method,
+                    $apiEndpoint,
+                    $data,
+                    (int) ceil(json_decode((string) $e->getResponse()->getBody())->retry_after / 1000)
+                );
+            }
+
+            // TODO: implement other HTTP errors
         }
 
         return null;
