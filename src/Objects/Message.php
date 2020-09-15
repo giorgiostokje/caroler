@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Caroler\Objects;
 
-use stdClass;
-
 /**
- * Message Object class
+ * Message object class
  *
  * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/channel#message-object
@@ -15,122 +13,122 @@ use stdClass;
 class Message extends AbstractObject implements ObjectInterface
 {
     /**
-     * @var string
+     * @var string Message id
      */
     protected $id;
 
     /**
-     * @var string
+     * @var string Message channel id
      */
     protected $channelId;
 
     /**
-     * @var string|null
+     * @var string|null Message guild id
      */
     protected $guildId;
 
     /**
-     * @var stdClass|\Caroler\Objects\User
+     * @var \Caroler\Objects\User Message author
      */
     protected $author;
 
     /**
-     * @var \Caroler\Objects\GuildMember|null Message author's member properties
+     * @var \Caroler\Objects\GuildMember|null Message author member properties
      */
     protected $member;
 
     /**
-     * @var string
+     * @var string Message contents
      */
     protected $content;
 
     /**
-     * @var string ISO8601 timestamp
+     * @var string Message sent ISO8601 timestamp
      */
     protected $timestamp;
 
     /**
-     * @var string|null ISO8601 timestamp
+     * @var string|null Message edited ISO8601 timestamp
      */
     protected $editedTimestamp;
 
     /**
-     * @var bool
+     * @var bool Whether message was TTS
      */
     protected $tts;
 
     /**
-     * @var bool
+     * @var bool Whether message mentions everyone
      */
     protected $mentionEveryone;
 
     /**
-     * @var \Caroler\Objects\User[]
+     * @var \Caroler\Objects\User[] Message user mentions
      */
     protected $mentions;
 
     /**
-     * @var \Caroler\Objects\Role[]
+     * @var \Caroler\Objects\Role[] Message role mentions
      */
     protected $mentionRoles;
 
     /**
-     * @var \Caroler\Objects\ChannelMention[]|null
+     * @var \Caroler\Objects\ChannelMention[]|null Message channel mentions
      */
     protected $mentionChannels;
 
     /**
-     * @var \Caroler\Objects\Attachment[]
+     * @var \Caroler\Objects\Attachment[] Message attachments
      */
     protected $attachments;
 
     /**
-     * @var \Caroler\Objects\Embed[]
+     * @var \Caroler\Objects\Embed[] Message embedded content
      */
     protected $embeds;
 
     /**
-     * @var \Caroler\Objects\Reaction[]|null
+     * @var \Caroler\Objects\Reaction[]|null Message reactions
      */
     protected $reactions;
 
     /**
-     * @var int|string|null Used for validating if a message was sent.
+     * @var int|string|null Used for validating if a message was sent
      */
     protected $nonce;
 
     /**
-     * @var bool
+     * @var bool Whether the message is pinned
      */
     protected $pinned;
 
     /**
-     * @var string|null
+     * @var string|null Message webhook id
      */
     protected $webhookId;
 
     /**
-     * @var int
+     * @var int Message type
      */
     protected $type;
 
     /**
-     * @var \Caroler\Objects\MessageActivity|null
+     * @var array|null Sent with Rich Presence-related chat embeds
      */
     protected $activity;
 
     /**
-     * @var \Caroler\Objects\MessageApplication|null
+     * @var array|null Sent with Rich Presence-related chat embeds
      */
     protected $application;
 
     /**
-     * @var \Caroler\Objects\MessageReference|null
+     * @var array|null Crossposted message reference data
      */
     protected $messageReference;
 
     /**
-     * @var int|null
+     * @var int|null Message flags
      */
     protected $flags;
 
@@ -174,7 +172,7 @@ class Message extends AbstractObject implements ObjectInterface
     /**
      * @return \Caroler\Objects\User
      */
-    public function getAuthor(): User
+    public function getAuthor(): \Caroler\Objects\User
     {
         return $this->author;
     }
@@ -182,7 +180,7 @@ class Message extends AbstractObject implements ObjectInterface
     /**
      * @return \Caroler\Objects\GuildMember|null
      */
-    public function getMember(): ?GuildMember
+    public function getMember(): ?\Caroler\Objects\GuildMember
     {
         return $this->member;
     }
@@ -308,25 +306,25 @@ class Message extends AbstractObject implements ObjectInterface
     }
 
     /**
-     * @return \Caroler\Objects\MessageActivity|null
+     * @return array|null
      */
-    public function getActivity(): ?MessageActivity
+    public function getActivity(): ?array
     {
         return $this->activity;
     }
 
     /**
-     * @return \Caroler\Objects\MessageApplication|null
+     * @return array|null
      */
-    public function getApplication(): ?MessageApplication
+    public function getApplication(): ?array
     {
         return $this->application;
     }
 
     /**
-     * @return \Caroler\Objects\MessageReference|null
+     * @return array|null
      */
-    public function getMessageReference(): ?MessageReference
+    public function getMessageReference(): ?array
     {
         return $this->messageReference;
     }

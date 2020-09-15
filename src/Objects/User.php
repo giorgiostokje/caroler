@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Caroler\Objects;
 
 /**
- * User Object class
+ * User object class
  *
  * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/user#user-object
@@ -13,67 +13,67 @@ namespace Caroler\Objects;
 class User extends AbstractObject implements ObjectInterface
 {
     /**
-     * @var string
+     * @var string User id
      */
     protected $id;
 
     /**
-     * @var string
+     * @var string User username (not unique)
      */
     protected $username;
 
     /**
-     * @var string
+     * @var string User 4-digit Discord tag
      */
     protected $discriminator;
 
     /**
-     * @var string
+     * @var string|null User avatar hash
      */
     protected $avatar;
 
     /**
-     * @var bool
+     * @var bool|null Whether the user belongs to an OAuth2 app
      */
     protected $bot;
 
     /**
-     * @var bool
+     * @var bool|null Whether the user is an Official Discord System user
      */
     protected $system;
 
     /**
-     * @var bool
+     * @var bool|null Whether the user account has 2FA enabled
      */
     protected $mfaEnabled;
 
     /**
-     * @var string|null
+     * @var string|null User language option of choice
      */
     protected $locale;
 
     /**
-     * @var bool
+     * @var bool|null Whether the user account's email is verified
      */
     protected $verified;
 
     /**
-     * @var string|null
+     * @var string|null User email
      */
     protected $email;
 
     /**
-     * @var int|null
+     * @var int|null User account flags
      */
     protected $flags;
 
     /**
-     * @var int|null
+     * @var int|null User account Nitro subscription type
      */
     protected $premiumType;
 
     /**
-     * @var int|null
+     * @var int|null User account public flags
      */
     protected $publicFlags;
 
@@ -102,35 +102,35 @@ class User extends AbstractObject implements ObjectInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAvatar(): string
+    public function getAvatar(): ?string
     {
         return $this->avatar;
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function isBot(): bool
+    public function getBot(): ?bool
     {
-        return $this->bot ?? false;
+        return $this->bot;
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function isSystem(): bool
+    public function getSystem(): ?bool
     {
-        return $this->system ?? false;
+        return $this->system;
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function isMfaEnabled(): bool
+    public function getMfaEnabled(): ?bool
     {
-        return $this->mfaEnabled ?? false;
+        return $this->mfaEnabled;
     }
 
     /**
@@ -142,11 +142,11 @@ class User extends AbstractObject implements ObjectInterface
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function isVerified(): bool
+    public function getVerified(): ?bool
     {
-        return $this->verified ?? false;
+        return $this->verified;
     }
 
     /**

@@ -7,7 +7,7 @@ namespace Caroler\Objects;
 use Caroler\Exceptions\InvalidArgumentException;
 
 /**
- * Embed Object class
+ * Embed object class
  *
  * @package Caroler\Objects
  * @see https://discord.com/developers/docs/resources/channel#embed-object
@@ -50,62 +50,62 @@ class Embed extends AbstractObject implements ObjectInterface
     public const COLOR_DISCORD = '#7289DA';
 
     /**
-     * @var string|null
+     * @var string|null Embed title
      */
     protected $title;
 
     /**
-     * @var string|null
+     * @var string|null Embed description
      */
     protected $description;
 
     /**
-     * @var string|null
+     * @var string|null Embed URL
      */
     protected $url;
 
     /**
-     * @var string|null ISO8601 timestamp
+     * @var string|null Embed content ISO8601 timestamp
      */
     protected $timestamp;
 
     /**
-     * @var string|null Hexadecimal color code
+     * @var string|null Embed hexadecimal color code
      */
     protected $color;
 
     /**
-     * @var array|null
+     * @var array|null Embed footer information
      */
     protected $footer;
 
     /**
-     * @var string|array|null
+     * @var string|array|null Embed image information
      */
     protected $image;
 
     /**
-     * @var array|null
+     * @var array|null Embed thumbnail information
      */
     protected $thumbnail;
 
     /**
-     * @var array|null
+     * @var array|null Embed video information
      */
     protected $video;
 
     /**
-     * @var array|null
+     * @var array|null Embed provider information
      */
     protected $provider;
 
     /**
-     * @var array|null
+     * @var array|null Embed author information
      */
     protected $author;
 
     /**
-     * @var array|null
+     * @var array|null Embed fields information
      */
     protected $fields = [];
 
