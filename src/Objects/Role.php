@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Caroler\Objects;
 
+use Caroler\Traits\HasPermissions;
+
 /**
  * Role object class
  *
@@ -12,6 +14,8 @@ namespace Caroler\Objects;
  */
 class Role extends AbstractObject implements ObjectInterface
 {
+    use HasPermissions;
+
     /**
      * @var string Role id
      */

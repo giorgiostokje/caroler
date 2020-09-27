@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Caroler\Objects;
 
+use Caroler\Traits\HasPermissions;
+
 /**
  * Guild Object class
  *
@@ -12,6 +14,8 @@ namespace Caroler\Objects;
  */
 class Guild extends AbstractObject implements ObjectInterface
 {
+    use HasPermissions;
+
     /**
      * @var string Guild id
      */
@@ -320,7 +324,7 @@ class Guild extends AbstractObject implements ObjectInterface
     /**
      * @return bool|null
      */
-    public function getOwner(): ?bool
+    public function isOwner(): ?bool
     {
         return $this->owner;
     }
@@ -440,7 +444,7 @@ class Guild extends AbstractObject implements ObjectInterface
     /**
      * @return bool|null
      */
-    public function getWidgetEnabled(): ?bool
+    public function isWidgetEnabled(): ?bool
     {
         return $this->widgetEnabled;
     }
@@ -488,7 +492,7 @@ class Guild extends AbstractObject implements ObjectInterface
     /**
      * @return bool|null
      */
-    public function getLarge(): ?bool
+    public function isLarge(): ?bool
     {
         return $this->large;
     }
@@ -496,7 +500,7 @@ class Guild extends AbstractObject implements ObjectInterface
     /**
      * @return bool|null
      */
-    public function getUnavailable(): ?bool
+    public function isUnavailable(): ?bool
     {
         return $this->unavailable;
     }

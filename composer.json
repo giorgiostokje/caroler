@@ -1,6 +1,6 @@
 {
     "name": "caroler/caroler",
-    "description": "An extensible Discord bot with optional Laravel integration.",
+    "description": "An extensible Discord bot and REST API wrapper with optional Laravel integration.",
     "type": "library",
     "license": "GNU GPLv3",
     "authors": [
@@ -12,6 +12,7 @@
     "minimum-stability": "stable",
     "require": {
         "guzzlehttp/guzzle": "^7.0",
+        "myclabs/php-enum": "^1.7",
         "ratchet/pawl": "^0.3.4",
         "react/event-loop": "^1.1",
         "react/socket": "^1.5",

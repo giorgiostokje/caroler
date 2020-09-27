@@ -1,5 +1,5 @@
 # Caroler
-Caroler is an extensible Discord bot written in PHP that can optionally be integrated with Laravel.
+Caroler is an extensible Discord bot and REST API wrapper written in PHP that can optionally be integrated with Laravel.
 
 ## Installation
 placeholder

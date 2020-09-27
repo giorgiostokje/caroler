@@ -11,7 +11,7 @@ use Caroler\Objects\Message;
 use stdClass;
 
 /**
- * MESSAGE_CREATE Event Handler class
+ * MESSAGE_CREATE Dispatch Event Handler class
  *
  * @package Caroler\EventHandlers\DispatchEvents
  * @see https://discord.com/developers/docs/topics/gateway#message-create

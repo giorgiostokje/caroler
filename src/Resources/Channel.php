@@ -31,7 +31,7 @@ class Channel extends AbstractResource implements ResourceInterface
     public function createMessage($message): ?Message
     {
         if (!$this->context instanceof Message && !is_string($this->context)) {
-            throw new InvalidArgumentException("Context must be either a Message object or a string!");
+            throw new InvalidArgumentException("Context must be either a Message Object or a string!");
         }
 
         $channelId = $this->context instanceof Message ? $this->context->getChannelId() : $this->context;

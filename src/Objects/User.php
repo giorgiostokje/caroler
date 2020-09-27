@@ -112,7 +112,7 @@ class User extends AbstractObject implements ObjectInterface
     /**
      * @return bool|null
      */
-    public function getBot(): ?bool
+    public function isBot(): ?bool
     {
         return $this->bot;
     }
@@ -120,7 +120,7 @@ class User extends AbstractObject implements ObjectInterface
     /**
      * @return bool|null
      */
-    public function getSystem(): ?bool
+    public function isSystem(): ?bool
     {
         return $this->system;
     }
@@ -128,7 +128,7 @@ class User extends AbstractObject implements ObjectInterface
     /**
      * @return bool|null
      */
-    public function getMfaEnabled(): ?bool
+    public function isMfaEnabled(): ?bool
     {
         return $this->mfaEnabled;
     }
@@ -144,7 +144,7 @@ class User extends AbstractObject implements ObjectInterface
     /**
      * @return bool|null
      */
-    public function getVerified(): ?bool
+    public function isVerified(): ?bool
     {
         return $this->verified;
     }

@@ -39,7 +39,7 @@ class About extends Command
                 ->setImage('https://i.imgur.com/Oo0qogl.png')
                 ->addField('Website', 'https://carolerbot.com')
                 ->addField('Discord Server', 'https://discord.gg/6m5sjTW')
-                ->addField('Version', Caroler::APP_VERSION . "\nhttps://github.com/giorgiostokje/caroler/tree/develop")
+                ->addField('Version', Caroler::APP_VERSION . "\nhttps://github.com/giorgiostokje/caroler")
                 ->addField('Developer', '<@137568507096203264>')
         ]);
 

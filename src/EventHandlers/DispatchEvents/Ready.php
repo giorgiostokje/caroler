@@ -12,7 +12,7 @@ use Caroler\State;
 use stdClass;
 
 /**
- * Ready Dispatch Event Handler class
+ * READY Dispatch Event Handler class
  *
  * @package Caroler\EventHandlers
  * @see https://discord.com/developers/docs/topics/gateway#ready

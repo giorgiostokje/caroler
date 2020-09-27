@@ -12,6 +12,8 @@ use Caroler\EventHandlers\EventHandlerFactory;
 use Caroler\OutputWriters\DiscordOutputWriter;
 use Caroler\OutputWriters\OutputWriterFactory;
 use Caroler\OutputWriters\OutputWriterInterface;
+use Caroler\Resources\Guild as GuildResource;
+use Caroler\Resources\User as UserResource;
 use Caroler\Stores\CommandStore;
 use Caroler\Stores\ConfigStore;
 use Caroler\Stores\RateLimitBucketStore;
@@ -51,7 +53,21 @@ class Caroler
     /**
      * @var string Discord REST API URL
      */
-    private const DISCORD_API_URL = 'https://discord.com/api/';
+    public const DISCORD_API_URL = 'https://discord.com/api/';
+
+    /**
+     * @var string Discord content delivery network URL
+     */
+    public const DISCORD_CDN_URL = 'https://cdn.discordapp.com/';
+
+    /**
+     * @var string Discord content delivery network endpoints
+     * @todo Find a better solution.
+     */
+    public const DISCORD_CDN_ENDPOINTS = [
+        'guild_icons' => 'icons/',
+        'user_avatars' => 'avatars/',
+    ];
 
     /**
      * @var \Caroler\Stores\ConfigStore Available configuration options
@@ -60,6 +76,7 @@ class Caroler
 
     /**
      * @var \Caroler\OutputWriters\OutputWriterInterface[] System output writers
+     * @todo Refactor to Monolog logging.
      */
     private $outputWriters = [];
 
@@ -107,6 +124,16 @@ class Caroler
      * @var \Caroler\State Current state of the application
      */
     private $state;
+
+    /**
+     * @var GuildResource Reusable Guild resource
+     */
+    private $guildResource;
+
+    /**
+     * @var GuildResource Reusable User resource
+     */
+    private $userResource;
 
     /**
      * @param array $options
@@ -662,5 +689,34 @@ class Caroler
         $this->state = $state;
 
         return $this;
+    }
+
+    // =========================================================================
+    // Resource Accessors
+    // =========================================================================
+
+    /**
+     * @param string $guildId
+     *
+     * @return \Caroler\Resources\Guild
+     */
+    public function guild(string $guildId): GuildResource
+    {
+        isset($this->guildResource) ?: $this->guildResource = new GuildResource();
+
+        return $this->guildResource->prepare($guildId, $this);
+    }
+
+    /**
+     * @param string|null $userId
+     *
+     * @return \Caroler\Resources\User
+     */
+    public function user(string $userId = null): UserResource
+    {
+        !is_null($userId) ?: $userId = '@me';
+        isset($this->userResource) ?: $this->userResource = new UserResource();
+
+        return $this->userResource->prepare($userId, $this);
     }
 }

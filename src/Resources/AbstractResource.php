@@ -6,8 +6,6 @@ namespace Caroler\Resources;
 
 use Caroler\Caroler;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7;
-use stdClass;
 
 /**
  * Common Resource functionality
@@ -38,16 +36,16 @@ abstract class AbstractResource implements ResourceInterface
     }
 
     /**
-     * Makes a HTTP request against the Discord REST API.
+     * Makes a (delayed) HTTP request against the Discord REST API.
      *
      * @param string $method
      * @param string $apiEndpoint
-     * @param array $data
+     * @param array|null $data
      * @param int $delay
      *
-     * @return \stdClass|null
+     * @return bool|array
      */
-    private function makeHttpRequest(string $method, string $apiEndpoint, array $data, int $delay = 0): ?stdClass
+    private function makeHttpRequest(string $method, string $apiEndpoint, ?array $data = null, int $delay = 0)
     {
         sleep($delay);
 
@@ -62,9 +60,10 @@ abstract class AbstractResource implements ResourceInterface
         }
 
         try {
+            /** @var \GuzzleHttp\Psr7\Response $response */
             $response = $this->caroler->getHttpClient()->$method(
                 $route,
-                ['json' => $data]
+                $method === 'post' ? ['json' => $data] : ['query' => $data]
             );
 
             if ($response->hasHeader('X-RateLimit-Bucket')) {
@@ -76,7 +75,12 @@ abstract class AbstractResource implements ResourceInterface
                 );
             }
 
-            return json_decode((string) $response->getBody());
+            switch ($response->getStatusCode()) {
+                case 204:
+                    return true;
+                default:
+                    return json_decode((string) $response->getBody(), true);
+            }
         } catch (RequestException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 429) {
                 $this->makeHttpRequest(
@@ -86,36 +90,46 @@ abstract class AbstractResource implements ResourceInterface
                     (int) ceil(json_decode((string) $e->getResponse()->getBody())->retry_after / 1000)
                 );
             }
-
-            // TODO: implement other HTTP errors
         }
 
-        return null;
+        return false;
     }
 
     /**
      * Makes a HTTP GET request against the Discord REST API.
      *
      * @param string $apiEndpoint
-     * @param array $data
+     * @param array|null $query
      *
-     * @return \stdClass|null
+     * @return bool|array
      */
-    protected function get(string $apiEndpoint, array $data): ?stdClass
+    protected function get(string $apiEndpoint, array $query = null)
     {
-        return $this->makeHttpRequest('get', $apiEndpoint, $data);
+        return $this->makeHttpRequest('get', $apiEndpoint, $query);
     }
 
     /**
      * Makes a HTTP POST request against the Discord REST API.
      *
      * @param string $apiEndpoint
-     * @param array $data
+     * @param array $params
      *
-     * @return \stdClass|null
+     * @return bool|array
      */
-    protected function post(string $apiEndpoint, array $data): ?stdClass
+    protected function post(string $apiEndpoint, array $params)
     {
-        return $this->makeHttpRequest('post', $apiEndpoint, $data);
+        return $this->makeHttpRequest('post', $apiEndpoint, $params);
+    }
+
+    /**
+     * Makes a HTTP DELETE request against the Discord REST API.
+     *
+     * @param  string  $apiEndpoint
+     *
+     * @return bool
+     */
+    protected function delete(string $apiEndpoint): bool
+    {
+        return $this->makeHttpRequest('delete', $apiEndpoint);
     }
 }
