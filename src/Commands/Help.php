@@ -8,39 +8,47 @@ use Caroler\Objects\Embed;
 
 class Help extends Command
 {
-    /**
-     * @var string Command signature
-     */
-    protected $signature = 'help';
-
-    /**
-     * @var string Command description
-     */
+    protected $signature = 'help {command? : Command to display help for}';
     protected $description = 'Displays a list of available commands.';
+    protected $author = '137568507096203264';
+    protected $version = '0.1.0';
 
     /**
      * @inheritDoc
-     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     public function handle(): bool
     {
-        $this->embed->setTitle("Available Commands")->setColor(Embed::COLOR_DISCORD);
-        $commands = $this->caroler->getCommands();
-        ksort($commands);
+        $cmdPrefix = $this->caroler()->getConfig('command_prefix');
 
-        foreach ($commands as $signature => $class) {
-            $command = new $class();
-            $this->embed->addField(
-                $this->caroler->getOption('command_prefix') . $signature,
-                $command->getDescription()
-            );
+        if (!is_null($this->argument('command'))) {
+            $command = $this->caroler()->getCommand($this->argument('command'));
+
+            if (!is_null($command)) {
+                $command = new $command();
+                $command->prepare($this->message(), $this->caroler());
+                $command->showHelpDialog();
+            }
+
             unset($command);
-        }
+        } else {
+            $this->embed()->setTitle("Available Commands")
+                ->setDescription("Type **{$cmdPrefix}help _command_** to view detailed command help.")
+                ->setColor(Embed::COLOR_DISCORD);
+            $commands = $this->caroler()->getCommands();
+            ksort($commands);
 
-        $this->channel->prepare($this->message, $this->caroler)->createMessage([
-            'content' => "",
-            'embed' => $this->embed
-        ]);
+            foreach ($commands as $name => $class) {
+                $command = new $class();
+                $this->embed()->addField(
+                    $cmdPrefix . $name,
+                    $command->getDescription()
+                );
+                unset($command);
+            }
+
+            $this->resource('channel')->createMessage('', $this->embed());
+        }
 
         return true;
     }

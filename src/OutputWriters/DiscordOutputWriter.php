@@ -43,8 +43,7 @@ class DiscordOutputWriter extends AbstractOutputWriter implements OutputWriterIn
     {
         $messages = $this->process($messages, $type);
 
-        $channel = new Channel();
-        $channel->prepare($this->channelId, $this->caroler);
+        $channel = (new Channel())->prepare($this->channelId, $this->caroler);
 
         foreach ($messages as $message) {
             $channel->createMessage($message);

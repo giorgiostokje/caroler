@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Caroler\Resources;
 
-use Caroler\Exceptions\InvalidArgumentException;
+use Caroler\Caroler;
+use Caroler\Objects\Embed;
 use Caroler\Objects\Message;
 
 /**
@@ -20,24 +21,34 @@ class Channel extends AbstractResource implements ResourceInterface
      */
     public const API_RESOURCE = 'channels/';
 
+    public function prepare($context, Caroler $caroler): ResourceInterface
+    {
+        return parent::prepare(
+            $context instanceof Message
+                ? $context->getChannelId() : $context,
+            $caroler
+        );
+    }
+
     /**
      * Creates and sends a message.
      *
-     * @param string|array $message
+     * @param string|null $message
+     *
+     * @param \Caroler\Objects\Embed|null $embed
      *
      * @return \Caroler\Objects\Message|null
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
-    public function createMessage($message): ?Message
+    public function createMessage(?string $message, Embed $embed = null): ?Message
     {
-        if (!$this->context instanceof Message && !is_string($this->context)) {
-            throw new InvalidArgumentException("Context must be either a Message Object or a string!");
+        if (!isset($message) && !isset($embed)) {
+            return null;
         }
 
-        $channelId = $this->context instanceof Message ? $this->context->getChannelId() : $this->context;
-        $data = ['content' => $message['content'] ?? $message];
-        !isset($message['embed']) ?: $data['embed'] = $message['embed']->toArray();
-
-        return (new Message())->prepare($this->post("$channelId/messages", $data));
+        return !($response = $this->post("$this->context/messages", [
+            'content' => $message,
+            'embed' => isset($embed) ? $embed->toArray() : null,
+        ])) ? null
+            : (new Message())->prepare($response);
     }
 }

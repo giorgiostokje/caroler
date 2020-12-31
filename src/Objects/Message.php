@@ -135,12 +135,18 @@ class Message extends AbstractObject implements ObjectInterface
     /**
      * @inheritDoc
      */
-    public function prepare($data): ObjectInterface
+    public function prepare(array $data): ObjectInterface
     {
-        parent::prepare($data);
+        if (isset($data['author'])) {
+            $this->author = (new User())->prepare($data['author']);
+            unset($data['author']);
+        }
+        if (isset($data['member'])) {
+            $this->member = (new GuildMember())->prepare($data['member']);
+            unset($data['member']);
+        }
 
-        $author = new User();
-        $this->author = $author->prepare($this->author);
+        parent::prepare($data);
 
         return $this;
     }
@@ -172,7 +178,7 @@ class Message extends AbstractObject implements ObjectInterface
     /**
      * @return \Caroler\Objects\User
      */
-    public function getAuthor(): \Caroler\Objects\User
+    public function getAuthor(): User
     {
         return $this->author;
     }
@@ -180,7 +186,7 @@ class Message extends AbstractObject implements ObjectInterface
     /**
      * @return \Caroler\Objects\GuildMember|null
      */
-    public function getMember(): ?\Caroler\Objects\GuildMember
+    public function getMember(): ?GuildMember
     {
         return $this->member;
     }

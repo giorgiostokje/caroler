@@ -6,8 +6,7 @@ namespace Caroler;
 
 use Caroler\Commands\About;
 use Caroler\Commands\Help;
-use Caroler\Exceptions\InvalidArgumentException;
-use Caroler\Exceptions\TokenNotFoundException;
+use Caroler\Exceptions\ConfigurationException;
 use Caroler\EventHandlers\EventHandlerFactory;
 use Caroler\OutputWriters\DiscordOutputWriter;
 use Caroler\OutputWriters\OutputWriterFactory;
@@ -72,7 +71,7 @@ class Caroler
     /**
      * @var \Caroler\Stores\ConfigStore Available configuration options
      */
-    private $configStore;
+    private $config;
 
     /**
      * @var \Caroler\OutputWriters\OutputWriterInterface[] System output writers
@@ -86,14 +85,14 @@ class Caroler
     private $httpClient;
 
     /**
-     * @var \Caroler\Stores\RateLimitBucketStore
+     * @var \Caroler\Stores\RateLimitBucketStore Discord REST API rate limit tracker
      */
-    private $rateLimitBucketStore;
+    private $rateLimitBuckets;
 
     /**
      * @var \Caroler\Stores\CommandStore Available bot commands
      */
-    private $commandStore;
+    private $commands;
 
     /**
      * @var \React\EventLoop\LoopInterface Application event loop
@@ -107,6 +106,7 @@ class Caroler
 
     /**
      * @var \React\EventLoop\Timer\Timer Heartbeat Timer instance
+     * @todo Refactor to custom TimerInterface implementation.
      */
     private $heartbeatTimer = null;
 
@@ -126,57 +126,68 @@ class Caroler
     private $state;
 
     /**
-     * @var GuildResource Reusable Guild resource
+     * @var GuildResource Reusable guild resource
      */
     private $guildResource;
 
     /**
-     * @var GuildResource Reusable User resource
+     * @var GuildResource Reusable user resource
      */
     private $userResource;
 
     /**
-     * @param array $options
+     * @param array $config
      *
-     * @throws \Caroler\Exceptions\TokenNotFoundException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \Caroler\Exceptions\ConfigurationException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(array $options = [])
+    public function __construct(array $config = [])
     {
-        $this->configStore = new ConfigStore();
-        $this->configureOptions($options);
-        if (!$this->optionExists('token')) {
-            throw new TokenNotFoundException("No Discord Bot Token defined!");
-        }
-        $this->optionExists('command_prefix') ?: $this->configureOption('command_prefix', '!');
-        $this->optionExists('debug') ?: $this->configureOption('debug', false);
+        $this->config = new ConfigStore();
+        $this->configureMultiple($config);
 
-        if ($this->optionExists('system_channel') && $this->getOption('system_channel') !== '') {
-            $this->setOutputWriter(new DiscordOutputWriter($this->getOption('system_channel'), $this));
+        if (!$this->configExists('token')) {
+            throw new ConfigurationException(
+                'Discord bot token not defined.',
+                ['config' => $config]
+            );
+        }
+        $this->configExists('command_prefix')
+            ?: $this->configure('command_prefix', '!');
+        $this->configExists('debug')
+            ?: $this->configure('debug', false);
+
+        if (
+            $this->configExists('system_channel')
+            && $this->getConfig('system_channel') !== ''
+        ) {
+            $this->setOutputWriter(new DiscordOutputWriter(
+                $this->getConfig('system_channel'),
+                $this
+            ));
         }
 
         $this->httpClient = new Client([
             'base_uri' => self::DISCORD_API_URL,
             'headers' => [
-                'Authorization' => 'Bot ' . $this->getOption('token')
+                'Authorization' => 'Bot ' . $this->getConfig('token')
             ]
         ]);
 
-        $this->rateLimitBucketStore = new RateLimitBucketStore();
+        $this->rateLimitBuckets = new RateLimitBucketStore();
 
-        $this->commandStore = new CommandStore();
-        $this->registerCommands($this->getOption('commands'))->registerCommands([
-            Help::class,
-            About::class,
-        ]);
+        $this->commands = new CommandStore();
+        $this->registerCommands($this->getConfig('commands'))
+            ->registerCommands([
+                About::class,
+                Help::class,
+            ]);
     }
 
     /**
      * Initializes the connection and listens for events from the Discord Gateway.
      *
      * @return void
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      * @see https://discord.com/developers/docs/topics/opcodes-and-status-codes
      */
@@ -190,23 +201,23 @@ class Caroler
 
         $this->write("Connecting to the Discord Gateway...");
 
-        $connector(self::DISCORD_GATEWAY_URL . '?v=' . self::DISCORD_GATEWAY_VERSION . '&encoding=json')->then(
-            function (WebSocket $conn) {
-                $this->connection = $conn;
-                $this->connection->on('message', function (MessageInterface $payload) {
-                    $payload = json_decode($payload->getPayload());
-                    $this->sequence = $payload->s;
+        $connector(self::DISCORD_GATEWAY_URL . '?v=' . self::DISCORD_GATEWAY_VERSION . '&encoding=json')
+            ->then(function (WebSocket $conn) {
+                    $this->connection = $conn;
+                    $this->connection->on('message', function (MessageInterface $payload) {
+                        $payload = json_decode($payload->getPayload(), true);
+                        $this->sequence = $payload['s'];
 
-                    EventHandlerFactory::make($payload)->handle($this);
-                });
+                        EventHandlerFactory::make($payload)->handle($this);
+                    });
             },
             function (Exception $e) {
                 $this->write("Failed to connect!");
                 $this->write($e->getMessage(), true);
 
                 $this->eventLoop->stop();
-            }
-        );
+                $this->sing();
+            });
 
         $this->eventLoop->run();
     }
@@ -215,6 +226,7 @@ class Caroler
      * Closes the Gateway connection and stops the application event loop.
      *
      * @return \Caroler\Caroler
+     * @api
      */
     public function conclude(): Caroler
     {
@@ -306,10 +318,11 @@ class Caroler
      * @param string $option
      *
      * @return bool
+     * @api
      */
-    public function optionExists(string $option): bool
+    public function configExists(string $option): bool
     {
-        return $this->configStore->exists($option);
+        return $this->config->exists($option);
     }
 
     /**
@@ -318,10 +331,11 @@ class Caroler
      * @param string $option
      *
      * @return mixed
+     * @api
      */
-    public function getOption(string $option)
+    public function getConfig(string $option)
     {
-        return $this->configStore->get($option);
+        return $this->config->get($option);
     }
 
     /**
@@ -333,9 +347,9 @@ class Caroler
      * @return $this
      * @api
      */
-    public function configureOption(string $option, $value): Caroler
+    public function configure(string $option, $value): Caroler
     {
-        $this->configStore->put($option, $value);
+        $this->config->put($option, $value);
 
         return $this;
     }
@@ -348,40 +362,14 @@ class Caroler
      * @return \Caroler\Caroler
      * @api
      */
-    public function configureOptions(array $options): Caroler
+    public function configureMultiple(array $options): Caroler
     {
         foreach ($options as $option => $value) {
-            !is_string($option) && !is_string($value) ?: $this->configureOption($option, $value);
+            !is_string($option) && !is_string($value)
+                ?: $this->configure($option, $value);
         }
 
         return $this;
-    }
-
-    /**
-     * Configures an option.
-     *
-     * @param string $option
-     * @param mixed $value
-     *
-     * @return $this
-     * @api
-     */
-    public function option(string $option, $value): Caroler
-    {
-        return $this->configureOption($option, $value);
-    }
-
-    /**
-     * Configures multiple options.
-     *
-     * @param array $options
-     *
-     * @return \Caroler\Caroler
-     * @api
-     */
-    public function options(array $options): Caroler
-    {
-        return $this->configureOptions($options);
     }
 
     // =========================================================================
@@ -405,8 +393,6 @@ class Caroler
      * @param string|OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\Caroler
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function setOutputWriter($outputWriter): Caroler
@@ -422,8 +408,7 @@ class Caroler
      * @param array[] $outputWriters
      *
      * @return \Caroler\Caroler
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @api
      */
     public function setOutputWriters(array $outputWriters): Caroler
     {
@@ -441,9 +426,8 @@ class Caroler
      * @param string|OutputWriterInterface|\Symfony\Component\Console\Output\OutputInterface $outputWriter
      *
      * @return \Caroler\Caroler
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
+     * @uses \Caroler\Caroler::setOutputWriter()
      */
     public function outputWriter($outputWriter): Caroler
     {
@@ -456,9 +440,8 @@ class Caroler
      * @param array[] $outputWriters
      *
      * @return \Caroler\Caroler
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
+     * @uses \Caroler\Caroler::setOutputWriters()
      */
     public function outputWriters(array $outputWriters): Caroler
     {
@@ -473,12 +456,11 @@ class Caroler
      * @param string|null $type info|comment|question|error
      *
      * @return \Caroler\Caroler
-     * @api
      */
     public function write($messages, bool $debug = false, string $type = null): Caroler
     {
         foreach ($this->outputWriters as $outputWriter) {
-            if (!$debug || ($this->getOption('debug'))) {
+            if (!$debug || ($this->getConfig('debug'))) {
                 $outputWriter->write($messages, $type);
             }
         }
@@ -499,7 +481,7 @@ class Caroler
      */
     public function rateLimitBucketExists(string $bucket): bool
     {
-        return $this->rateLimitBucketStore->exists($bucket);
+        return $this->rateLimitBuckets->exists($bucket);
     }
 
     /**
@@ -511,7 +493,7 @@ class Caroler
      */
     public function getRateLimitBucketByRoute(string $route): ?array
     {
-        $buckets = $this->rateLimitBucketStore->get();
+        $buckets = $this->rateLimitBuckets->get();
         foreach ($buckets as $bucket) {
             foreach ($bucket['endpoints'] as $bucketEndpoint) {
                 if ($route === $bucketEndpoint) {
@@ -533,13 +515,18 @@ class Caroler
      *
      * @return \Caroler\Caroler
      */
-    public function updateRateLimitBucket(string $bucket, string $endpoint, ?int $remaining, ?int $reset): Caroler
-    {
+    public function updateRateLimitBucket(
+        string $bucket,
+        string $endpoint,
+        ?int $remaining = null,
+        int $reset = null
+    ): Caroler {
         $rateLimitBucket = [];
 
-        if ($this->rateLimitBucketStore->exists($bucket)) {
-            $rateLimitBucket = $this->rateLimitBucketStore->get($bucket);
-            !isset($rateLimitBucket['endpoints'][$endpoint]) ?: $rateLimitBucket['endpoints'][] = $endpoint;
+        if ($this->rateLimitBuckets->exists($bucket)) {
+            $rateLimitBucket = $this->rateLimitBuckets->get($bucket);
+            !isset($rateLimitBucket['endpoints'][$endpoint])
+                ?: $rateLimitBucket['endpoints'][] = $endpoint;
         } else {
             $rateLimitBucket['endpoints'] = [$endpoint];
         }
@@ -547,7 +534,7 @@ class Caroler
         $rateLimitBucket['remaining'] = $remaining;
         $rateLimitBucket['reset'] = $reset;
 
-        $this->rateLimitBucketStore->put($bucket, $rateLimitBucket);
+        $this->rateLimitBuckets->put($bucket, $rateLimitBucket);
 
         return $this;
     }
@@ -559,60 +546,58 @@ class Caroler
     /**
      * Determines whether or not a command exists.
      *
-     * @param string $signature
+     * @param string $name
      *
      * @return bool
+     * @api
      */
-    public function commandExists(string $signature): bool
+    public function commandExists(string $name): bool
     {
-        return $this->commandStore->exists($signature);
+        return $this->commands->exists($name);
     }
 
     /**
      * Retrieves a command class' name.
      *
-     * @param string $signature
+     * @param string $name
      *
      * @return string|null
+     * @api
      */
-    public function getCommand(string $signature): ?string
+    public function getCommand(string $name): ?string
     {
-        return $this->commandStore->get($signature);
+        return $this->commands->get($name);
     }
 
     /**
      * Retrieves all available commands.
      *
      * @return array
+     * @api
      */
     public function getCommands(): array
     {
-        return $this->commandStore->get();
+        return $this->commands->get();
     }
 
     /**
      * Registers a bot command.
      *
      * @param string $class
-     * @param string|null $signature
+     * @param null $name
      *
      * @return \Caroler\Caroler
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
-    public function registerCommand(string $class, $signature = null): Caroler
+    public function registerCommand(string $class, $name = null): Caroler
     {
-        try {
-            /** @var \Caroler\Commands\CommandInterface $command */
-            $command = new $class();
-            $signature = !is_null($signature) && is_string($signature) ? $signature : $command->getSignature();
-            unset($command);
-        } catch (Exception $e) {
-            throw new InvalidArgumentException("Invalid command class \"$class\"!");
-        }
+        /** @var \Caroler\Commands\CommandInterface $command */
+        $command = new $class();
+        $name = !is_null($name) && is_string($name)
+            ? $name : $command->getName();
+        unset($command);
 
-        $this->commandStore->put($signature, $class);
+        $this->commands->put($name, $class);
 
         return $this;
     }
@@ -623,14 +608,12 @@ class Caroler
      * @param array $commands As [<'signature' => >'command_class', ...]
      *
      * @return \Caroler\Caroler
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
      */
     public function registerCommands(array $commands): Caroler
     {
-        foreach ($commands as $signature => $command) {
-            $this->registerCommand($command, $signature);
+        foreach ($commands as $name => $command) {
+            $this->registerCommand($command, $name);
         }
 
         return $this;
@@ -643,9 +626,8 @@ class Caroler
      * @param string|null $signature
      *
      * @return \Caroler\Caroler
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
+     * @uses \Caroler\Caroler::registerCommand()
      */
     public function command(string $class, string $signature = null): Caroler
     {
@@ -658,9 +640,8 @@ class Caroler
      * @param array $commands As [<'signature' => >'command_class', ...]
      *
      * @return \Caroler\Caroler
-     * @throws \Caroler\Exceptions\InvalidArgumentException
-     * @throws \Caroler\Exceptions\InvalidArgumentException
      * @api
+     * @uses \Caroler\Caroler::registerCommands()
      */
     public function commands(array $commands): Caroler
     {
@@ -699,24 +680,30 @@ class Caroler
      * @param string $guildId
      *
      * @return \Caroler\Resources\Guild
+     * @api
      */
     public function guild(string $guildId): GuildResource
     {
         isset($this->guildResource) ?: $this->guildResource = new GuildResource();
 
-        return $this->guildResource->prepare($guildId, $this);
+        $this->guildResource->prepare($guildId, $this);
+
+        return $this->guildResource;
     }
 
     /**
      * @param string|null $userId
      *
      * @return \Caroler\Resources\User
+     * @api
      */
     public function user(string $userId = null): UserResource
     {
         !is_null($userId) ?: $userId = '@me';
         isset($this->userResource) ?: $this->userResource = new UserResource();
 
-        return $this->userResource->prepare($userId, $this);
+        $this->userResource->prepare($userId, $this);
+
+        return $this->userResource;
     }
 }

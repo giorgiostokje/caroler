@@ -14,25 +14,20 @@ use Caroler\Objects\Embed;
  */
 class About extends Command
 {
-    /**
-     * @var string Command signature
-     */
     protected $signature = 'about';
-
-    /**
-     * @var string Command description
-     */
     protected $description = 'Displays information about the Caroler Discord bot.';
+    protected $author = '137568507096203264';
+    protected $version = '1.0.0';
 
     /**
      * @inheritDoc
-     * @throws \Caroler\Exceptions\InvalidArgumentException
+     * @throws \OutOfBoundsException
      */
     public function handle(): bool
     {
-        $this->channel->prepare($this->message, $this->caroler)->createMessage([
-            'content' => "",
-            'embed' => $this->embed->setTitle('Caroler')
+        $this->resource('channel')->createMessage(
+            null,
+            $this->embed()->setTitle('Caroler')
                 ->setDescription('An extensible Discord bot written in PHP.')
                 ->setUrl('https://carolerbot.com')
                 ->setColor(Embed::COLOR_DISCORD)
@@ -41,7 +36,7 @@ class About extends Command
                 ->addField('Discord Server', 'https://discord.gg/6m5sjTW')
                 ->addField('Version', Caroler::APP_VERSION . "\nhttps://github.com/giorgiostokje/caroler")
                 ->addField('Developer', '<@137568507096203264>')
-        ]);
+        );
 
         return true;
     }

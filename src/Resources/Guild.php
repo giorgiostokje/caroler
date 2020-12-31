@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Caroler\Resources;
 
+use Caroler\Caroler;
 use Caroler\Objects\Ban;
 use Caroler\Objects\Guild as GuildObject;
 use Caroler\Objects\GuildMember;
+use Caroler\Objects\Message;
 use Caroler\Objects\Role;
-use Caroler\Objects\User;
 
 /**
  * Resource class facilitating communications with the various Discord REST API endpoints in the Guild resource.
@@ -22,6 +23,18 @@ class Guild extends AbstractResource implements ResourceInterface
      * @var string REST API resource
      */
     public const API_RESOURCE = 'guilds/';
+
+    /**
+     * @inheritDoc
+     */
+    public function prepare($context, Caroler $caroler): ResourceInterface
+    {
+        return parent::prepare(
+            $context instanceof Message
+                ? $context->getGuildId() : $context,
+            $caroler
+        );
+    }
 
     /**
      * @param bool $withCounts
@@ -92,6 +105,24 @@ class Guild extends AbstractResource implements ResourceInterface
         }
 
         return $bans;
+    }
+
+    /**
+     * @param string $userId
+     * @param int|null $deleteMessageDays
+     * @param string|null $reason
+     *
+     * @return bool
+     */
+    public function createGuildBan(
+        string $userId,
+        ?int $deleteMessageDays,
+        string $reason = null
+    ): bool {
+        return $this->put("$this->context/bans/$userId", [
+            'delete_message_days' => $deleteMessageDays,
+            'reason' => $reason,
+        ]);
     }
 
     /**

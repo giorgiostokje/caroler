@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Caroler\EventHandlers;
 
 use Caroler\Caroler;
-use stdClass;
 
 /**
  * Unimplemented Event Handler class
@@ -17,7 +16,7 @@ class NullEventHandler implements EventHandlerInterface
     /**
      * @inheritDoc
      */
-    public function prepare(?stdClass $data): EventHandlerInterface
+    public function prepare(?array $data): EventHandlerInterface
     {
         return $this;
     }

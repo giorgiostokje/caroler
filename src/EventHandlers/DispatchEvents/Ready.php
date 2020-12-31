@@ -9,7 +9,6 @@ use Caroler\EventHandlers\AbstractEventHandler;
 use Caroler\EventHandlers\EventHandlerInterface;
 use Caroler\Objects\User;
 use Caroler\State;
-use stdClass;
 
 /**
  * READY Dispatch Event Handler class
@@ -25,7 +24,7 @@ class Ready extends AbstractEventHandler implements EventHandlerInterface
     protected $v;
 
     /**
-     * @var stdClass|\Caroler\Objects\User
+     * @var array|\Caroler\Objects\User
      */
     protected $user;
 
@@ -54,8 +53,7 @@ class Ready extends AbstractEventHandler implements EventHandlerInterface
      */
     public function handle(Caroler $caroler): EventHandlerInterface
     {
-        $user = new User();
-        $user->prepare($this->user);
+        $user = (new User())->prepare($this->user);
 
         $caroler->setState((new State())->setV($this->v)
             ->setUser($user)

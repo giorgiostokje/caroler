@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Caroler\EventHandlers;
 
 use Caroler\Traits\Populatable;
-use stdClass;
 
 /**
  * Common Event Handler functionality
@@ -19,7 +18,7 @@ abstract class AbstractEventHandler implements EventHandlerInterface
     /**
      * @inheritDoc
      */
-    public function prepare(?stdClass $data): EventHandlerInterface
+    public function prepare(?array $data): EventHandlerInterface
     {
         $this->populate($data);
 

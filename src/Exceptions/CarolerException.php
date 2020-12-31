@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Caroler\Exceptions;
 
-use Exception;
-
 /**
- * General application exception class
+ * General application exception interface
  *
  * @package Caroler\Exceptions
  */
-class CarolerException extends Exception
+interface CarolerException
 {
-
+    /**
+     * Retrieves the context in which the exception occurred.
+     *
+     * @return array
+     */
+    public function getContext(): array;
 }

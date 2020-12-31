@@ -270,7 +270,12 @@ trait HasPermissions
     private function hasPermission(Permission $permission): bool
     {
         return !is_null($this->getPermissionsNew())
-            ? ($this->getPermissionsNew() & hexdec($permission)) === hexdec($permission)
+            ? (
+                ($this->getPermissionsNew() & hexdec(Permission::ADMINISTRATOR()))
+                    === hexdec(Permission::ADMINISTRATOR())
+                || ($this->getPermissionsNew() & hexdec($permission))
+                    === hexdec($permission)
+            )
             : false;
     }
 }

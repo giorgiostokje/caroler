@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Caroler\Resources;
 
 use Caroler\Caroler;
+use Caroler\Exceptions\InvalidArgumentException;
+use Caroler\Objects\Message;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -26,9 +28,14 @@ abstract class AbstractResource implements ResourceInterface
 
     /**
      * @inheritDoc
+     * @throws \Caroler\Exceptions\InvalidArgumentException
      */
     public function prepare($context, Caroler $caroler): ResourceInterface
     {
+        if (!$context instanceof Message && !is_string($context)) {
+            throw new InvalidArgumentException("Context must be either a Message Object or a string!");
+        }
+
         $this->context = $context;
         $this->caroler = $caroler;
 
@@ -63,7 +70,7 @@ abstract class AbstractResource implements ResourceInterface
             /** @var \GuzzleHttp\Psr7\Response $response */
             $response = $this->caroler->getHttpClient()->$method(
                 $route,
-                $method === 'post' ? ['json' => $data] : ['query' => $data]
+                $method === 'post' || $method === 'put' ? ['json' => $data] : ['query' => $data]
             );
 
             if ($response->hasHeader('X-RateLimit-Bucket')) {
@@ -119,6 +126,19 @@ abstract class AbstractResource implements ResourceInterface
     protected function post(string $apiEndpoint, array $params)
     {
         return $this->makeHttpRequest('post', $apiEndpoint, $params);
+    }
+
+    /**
+     * Makes a HTTP PUT request against the Discord REST API.
+     *
+     * @param string $apiEndpoint
+     * @param array $params
+     *
+     * @return bool|array
+     */
+    protected function put(string $apiEndpoint, array $params)
+    {
+        return $this->makeHttpRequest('put', $apiEndpoint, $params);
     }
 
     /**

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Caroler\EventHandlers;
 
 use Caroler\Caroler;
-use stdClass;
 
 /**
  * Common Event Handler interface
@@ -20,11 +19,11 @@ interface EventHandlerInterface
     /**
      * Prepares the Event Handler.
      *
-     * @param \stdClass|null $data
+     * @param array|null $data
      *
      * @return \Caroler\EventHandlers\EventHandlerInterface
      */
-    public function prepare(?stdClass $data): EventHandlerInterface;
+    public function prepare(?array $data): EventHandlerInterface;
 
     /**
      * Executes the Event Handler's logic.

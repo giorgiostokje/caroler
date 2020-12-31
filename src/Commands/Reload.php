@@ -6,7 +6,6 @@ namespace Caroler\Commands;
 
 class Reload extends Command implements CommandInterface
 {
-
     /**
      * @var string Command signature
      */

@@ -6,7 +6,6 @@ namespace Caroler\EventHandlers;
 
 use Caroler\EventHandlers\DispatchEvents\MessageCreate;
 use Caroler\EventHandlers\DispatchEvents\Ready;
-use stdClass;
 
 /**
  * Event Handler factory class
@@ -18,11 +17,11 @@ class EventHandlerFactory
     /**
      * Creates and prepares an Event Handler based on the given payload.
      *
-     * @param \stdClass $payload
+     * @param array $payload
      *
      * @return \Caroler\EventHandlers\EventHandlerInterface
      */
-    public static function make(stdClass $payload): EventHandlerInterface
+    public static function make(array $payload): EventHandlerInterface
     {
         $eventMap = [
             0 => [
@@ -50,14 +49,14 @@ class EventHandlerFactory
             }
         ];
 
-        $event = array_key_exists($payload->op, $eventMap)
-            ? is_array($eventMap[$payload->op])
-                ? array_key_exists($payload->t, $eventMap[$payload->op])
-                    ? $eventMap[$payload->op][$payload->t]()
+        $event = array_key_exists($payload['op'], $eventMap)
+            ? is_array($eventMap[$payload['op']])
+                ? array_key_exists($payload['t'], $eventMap[$payload['op']])
+                    ? $eventMap[$payload['op']][$payload['t']]()
                     : new NullEventHandler()
-                : $eventMap[$payload->op]()
+                : $eventMap[$payload['op']]()
             : new NullEventHandler();
 
-        return $event->prepare($payload->d);
+        return $event->prepare($payload['d']);
     }
 }

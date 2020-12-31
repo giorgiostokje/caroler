@@ -8,7 +8,6 @@ use Caroler\Caroler;
 use Caroler\EventHandlers\AbstractEventHandler;
 use Caroler\EventHandlers\EventHandlerInterface;
 use Caroler\Objects\Message;
-use stdClass;
 
 /**
  * MESSAGE_CREATE Dispatch Event Handler class
@@ -31,7 +30,7 @@ class MessageCreate extends AbstractEventHandler implements EventHandlerInterfac
     /**
      * @inheritDoc
      */
-    public function prepare(?stdClass $data): EventHandlerInterface
+    public function prepare(?array $data): EventHandlerInterface
     {
         $this->message->prepare($data);
 
@@ -51,28 +50,34 @@ class MessageCreate extends AbstractEventHandler implements EventHandlerInterfac
             substr(
                 $this->message->getContent(),
                 0,
-                strlen($caroler->getOption('command_prefix'))
-            ) === $caroler->getOption('command_prefix')
+                strlen($caroler->getConfig('command_prefix'))
+            ) === $caroler->getConfig('command_prefix')
         ) {
-            $signature = substr(
+            $name = substr(
                 strtok($this->message->getContent(), ' '),
-                strlen($caroler->getOption('command_prefix')),
-                strlen(strtok($this->message->getContent(), ' ')) - strlen($caroler->getOption('command_prefix'))
+                strlen($caroler->getConfig('command_prefix')),
+                strlen(strtok($this->message->getContent(), ' '))
+                    - strlen($caroler->getConfig('command_prefix'))
             );
         }
 
-        if (isset($signature) && $caroler->commandExists($signature)) {
-            $command = $caroler->getCommand($signature);
+        if (isset($name) && $caroler->commandExists($name)) {
+            $command = $caroler->getCommand($name);
             /** @var \Caroler\Commands\CommandInterface $command */
             $command = new $command();
         }
 
         if (
             isset($command)
-            && (($command->requiresAdmin() && $this->message->getAuthor()->getId() === $caroler->getOption('admin_id'))
-                || !$command->requiresAdmin())
+            && (
+                ($command->requiresSuperAdmin()
+                    && $this->message->getAuthor()->getId() === $caroler->getConfig('admin_id'))
+                || !$command->requiresSuperAdmin()
+            )
+            && $command->prepare($this->message, $caroler)
+            && $command->validate()
         ) {
-            $command->prepare($this->message, $caroler)->handle();
+            $command->handle();
         }
 
         return $this;
